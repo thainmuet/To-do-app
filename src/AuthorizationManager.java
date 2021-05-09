@@ -3,6 +3,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
@@ -19,17 +20,17 @@ public class AuthorizationManager {
     @FXML
     private Text signUpWarning;
     @FXML
+    private Text signInWarning;
+    @FXML
     private TextField signInUsername;
     @FXML
-    private TextField signInPassword;
+    private PasswordField signInPassword;
     @FXML
     private TextField signUpUsername;
     @FXML
     private TextField signUpPassword;
     @FXML
-    private Button openSignUp;
-    @FXML
-    private Button signIn;
+    public Button signIn;
     @FXML
     private Button signUp;
 
@@ -38,26 +39,26 @@ public class AuthorizationManager {
         try {
             Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource(LOGIN_WINDOW_PATH)));
             Scene scene = new Scene(root);
-            Stage signInWindow = new Stage();
-            signInWindow.initModality(Modality.APPLICATION_MODAL);
-            signInWindow.setScene(scene);
-            signInWindow.setTitle(LOGIN_WINDOW_TITLE);
-            signInWindow.show();
+            Stage signInStage = new Stage();
+            signInStage.initModality(Modality.APPLICATION_MODAL);
+            signInStage.setScene(scene);
+            signInStage.setTitle(LOGIN_WINDOW_TITLE);
+            signInStage.show();
         } catch (Exception e) {
-            System.out.print("Can not open log in window");
+            System.out.print("Can not open sign in window");
         }
     }
 
     @FXML
     public void launchSignUpWindow() {
         try {
-            Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource(SIGNUP_WINDOW_PATH)));
+            Parent root = FXMLLoader.load(Objects.requireNonNull(AuthorizationManager.class.getResource(SIGNUP_WINDOW_PATH)));
             Scene scene = new Scene(root);
-            Stage signupWindow = new Stage();
-            signupWindow.initModality(Modality.APPLICATION_MODAL);
-            signupWindow.setScene(scene);
-            signupWindow.setTitle(LOGIN_WINDOW_TITLE);
-            signupWindow.show();
+            Stage signUpStage = new Stage();
+            signUpStage.initModality(Modality.APPLICATION_MODAL);
+            signUpStage.setScene(scene);
+            signUpStage.setTitle(LOGIN_WINDOW_TITLE);
+            signUpStage.show();
         } catch (Exception e) {
             System.out.print("Can not open sign up window");
         }
@@ -73,6 +74,18 @@ public class AuthorizationManager {
         } else {
             signUpWarning.setVisible(false);
             signUnStage.close();
+        }
+    }
+
+    @FXML
+    public void signIn() {
+        boolean isAuth = DatabaseManager.logInAuthorize(signInUsername.getText(), signInPassword.getText());
+        Stage signInStage = (Stage) signIn.getScene().getWindow();
+        if (isAuth) {
+            signInWarning.setVisible(false);
+            signInStage.close();
+        } else {
+            signInWarning.setVisible(true);
         }
     }
 }

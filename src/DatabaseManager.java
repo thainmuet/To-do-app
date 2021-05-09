@@ -1,5 +1,6 @@
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class DatabaseManager {
@@ -38,14 +39,14 @@ public class DatabaseManager {
         }
     }
 
-    private static ArrayList<String> getUsers() {
-        ArrayList<String> users = new ArrayList<>();
+    private static HashMap<String, String> getUsers() {
+        HashMap<String, String> users = new HashMap<>();
         try(Connection conn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD)) {
             Statement stmt = conn.createStatement();
             String query = String.format("SELECT username, password FROM %s;", "user");
             ResultSet rs = stmt.executeQuery(query);
             while(rs.next()) {
-                users.add(rs.getString("username"));
+                users.put(rs.getString("username"), rs.getString("password"));
             }
         } catch (SQLException e) {
             printExceptionLog(e);
@@ -53,13 +54,18 @@ public class DatabaseManager {
         return users;
     }
 
+    public static boolean logInAuthorize(String username, String password) {
+        HashMap<String, String> userList = getUsers();
+        if (userList.containsKey(username)) {
+            return userList.get(username).equals(password);
+        }
+        return false;
+    }
+
     public static boolean createAccount(String username, String password) {
         try(Connection conn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD)) {
-            ArrayList<String> users = getUsers();
-            for (String user : users) {
-                if (user.equals(username)) {
-                    return false;
-                }
+            if (getUsers().containsKey(username)) {
+                return false;
             }
             Statement stmt = conn.createStatement();
             String query = String.format("INSERT INTO %s (username, password) VALUES ('%s', '%s')", "user", username, password);
