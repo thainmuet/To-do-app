@@ -1,7 +1,6 @@
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public class DatabaseManager {
 
@@ -39,7 +38,7 @@ public class DatabaseManager {
         }
     }
 
-    private static HashMap<String, String> getUsers() {
+    public static HashMap<String, String> getUsers() {
         HashMap<String, String> users = new HashMap<>();
         try(Connection conn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD)) {
             Statement stmt = conn.createStatement();
@@ -54,7 +53,30 @@ public class DatabaseManager {
         return users;
     }
 
-    public static boolean logInAuthorize(String username, String password) {
+    public static ArrayList<Task> getTasks(String username) {
+        ArrayList<Task> tasks = new ArrayList<>();
+        try(Connection conn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD)) {
+            Statement stmt = conn.createStatement();
+            String query = String.format("SELECT * FROM %s WHERE username='%s';", "task", username);
+            ResultSet rs = stmt.executeQuery(query);
+            while(rs.next()) {
+                Task task = new Task(rs.getString("title"),
+                        rs.getString("username"),
+                        rs.getString("description"),
+                        rs.getString("added_date"),
+                        rs.getString("added_date"),
+                        rs.getString("tag"),
+                        rs.getString("flag"),
+                        rs.getBoolean("completed"));
+                tasks.add(task);
+            }
+        } catch (SQLException e) {
+            printExceptionLog(e);
+        }
+        return tasks;
+    }
+
+    public static boolean authorize(String username, String password) {
         HashMap<String, String> userList = getUsers();
         if (userList.containsKey(username)) {
             return userList.get(username).equals(password);

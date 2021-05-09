@@ -27,15 +27,15 @@ INSERT INTO importance(flag, grade)
 
 CREATE TABLE IF NOT EXISTS task (
     task_id INT AUTO_INCREMENT NOT NULL,
-    username CHAR NOT NULL,
+    username CHAR(16) NOT NULL,
     title VARCHAR(255) NOT NULL,
-    decription TEXT,
+    description TEXT,
     due_date DATE,
     added_date DATE,
     iteration BOOLEAN DEFAULT FALSE,
     tag VARCHAR(255),
     completed TINYINT(1) DEFAULT FALSE,
-    flag CHAR(50),
+    flag CHAR(50) DEFAULT 'None',
     PRIMARY KEY (task_id, username),
     FOREIGN KEY (username)
         REFERENCES user (username),
@@ -45,13 +45,13 @@ CREATE TABLE IF NOT EXISTS task (
 
 CREATE TABLE IF NOT EXISTS project (
     project_id INT AUTO_INCREMENT NOT NULL,
-    username CHAR NOT NULL,
+    username CHAR(16) NOT NULL,
     title VARCHAR(255) NOT NULL,
-    decription TEXT,
+    description TEXT,
     due_date DATE,
     added_date DATE,
     tag VARCHAR(255),
-    completed TINYINT(1),
+    completed TINYINT(1) DEFAULT FALSE,
     flag CHAR(50),
     PRIMARY KEY (project_id, username),
     FOREIGN KEY (username)
@@ -67,5 +67,24 @@ CREATE TABLE IF NOT EXISTS project (
 --             WHERE completed = TRUE)
 -- );
 
+
+-- Create new user
 INSERT INTO user (username, password)
-    VALUES ('root', 'toor'); 
+    VALUES 
+        ('root', 'toor'),
+        ('admin', 'admin');
+
+
+-- Add new task
+-- INSERT INTO task (username, title)
+--     VALUES 
+--         ('root', 'Finish DB project'),
+--         ('root', 'Complete Cloud computing course'),
+--         ('admin', 'Complete discrete math'),
+--         ('admin', 'Complete 2 hackerRank problems');
+
+
+-- Get user tasks
+SELECT * FROM task WHERE username = 'root';
+
+SELECT * FROM task WHERE username = 'admin';

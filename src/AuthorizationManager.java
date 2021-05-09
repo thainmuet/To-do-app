@@ -34,6 +34,8 @@ public class AuthorizationManager {
     @FXML
     private Button signUp;
 
+    private User user;
+
     @FXML
     public void launchSignInWindow() {
         try {
@@ -79,13 +81,21 @@ public class AuthorizationManager {
 
     @FXML
     public void signIn() {
-        boolean isAuth = DatabaseManager.logInAuthorize(signInUsername.getText(), signInPassword.getText());
+        String username = signInUsername.getText();
+        String password = signInPassword.getText();
+        boolean isAuth = DatabaseManager.authorize(username, password );
         Stage signInStage = (Stage) signIn.getScene().getWindow();
         if (isAuth) {
+            user = new User(username, password);
             signInWarning.setVisible(false);
             signInStage.close();
         } else {
             signInWarning.setVisible(true);
         }
+        this.user.getTasks();
+    }
+
+    public User getUser() {
+        return this.user;
     }
 }
