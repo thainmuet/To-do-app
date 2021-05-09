@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Text?>
 
-
-<fx:root prefHeight="400.0" prefWidth="600.0" type="AnchorPane" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="App">
+<fx:root prefHeight="600.0" prefWidth="400.0" type="AnchorPane" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="App">
    <children>
-      <Label layoutX="161.0" layoutY="97.0" text="ABD" />
+      <Text layoutX="186.0" layoutY="45.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Test" />
    </children>
 </fx:root>

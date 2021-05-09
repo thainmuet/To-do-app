@@ -1,17 +1,20 @@
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
-import java.sql.*;
+import java.io.IOException;
+import java.util.Objects;
 
 
 public class App extends Application {
 
     private static final String APP_NAME = "To-do";
-    private static final String APP_WINDOW_PATH = "view/AppWindow.fxml";
+    private static final String APP_WINDOW_PATH = "view/App.fxml";
 
+    AuthorizationManager auth = new AuthorizationManager();
 
     public static void main(String[] args) {
         launch(args);
@@ -20,20 +23,21 @@ public class App extends Application {
     @Override
     public void start(Stage window) {
         DatabaseManager.loadDriver();
-        DatabaseManager.createDatabase("To_do_app");
+        DatabaseManager.createDatabase();
         launchApp();
+        auth.launchSignInWindow();
     }
 
     private void launchApp() {
-        FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(App.class.getResource(APP_WINDOW_PATH));
-
-        AnchorPane rootLayout = new AnchorPane();
-        loader.setRoot(rootLayout);
-        Scene scene = new Scene(rootLayout);
-        Stage appWindow = new Stage();
-        appWindow.setScene(scene);
-        appWindow.setTitle(APP_NAME);
-        appWindow.show();
+        try {
+            Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource(APP_WINDOW_PATH)));
+            Scene scene = new Scene(root);
+            Stage appWindow = new Stage();
+            appWindow.setTitle(APP_NAME);
+            appWindow.setScene(scene);
+            appWindow.show();
+        } catch (Exception e) {
+            System.out.print("Can not load App window");
+        }
     }
 }
