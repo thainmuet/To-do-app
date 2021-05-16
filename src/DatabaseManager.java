@@ -61,8 +61,8 @@ public class DatabaseManager {
             String query = String.format("SELECT * FROM %s WHERE username='%s';", "task", username);
             ResultSet rs = statement.executeQuery(query);
             while(rs.next()) {
-                Task task = new Task(rs.getString("title"),
-                        rs.getString("username"),
+                Task task = new Task(rs.getString("username"),
+                        rs.getString("title"),
                         rs.getString("description"),
                         rs.getString("added_date"),
                         rs.getString("added_date"),

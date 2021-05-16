@@ -32,26 +32,16 @@ public class User {
         this.password = password;
     }
 
-    public void getTasks() {
-        if (!tasks.isEmpty()) {
-            for (Task task : tasks) {
-                System.out.println(task.getTitle());
-                System.out.println(task.getUsername());
-            }
-        } else {
-            System.out.println("Empty task");
-        }
+    public void setInfo(String username, String password) {
+        this.username = username;
+        this.password = password;
     }
 
-    public void setTasks(ArrayList<Task> tasks) {
-        this.tasks = tasks;
+    public void addTask(Task task) {
+        this.tasks.add(task);
     }
 
-    public ArrayList<Project> getProjects() {
-        return projects;
-    }
-
-    public void setProjects(ArrayList<Project> projects) {
-        this.projects = projects;
+    public ArrayList<Task> getTasks() {
+        return tasks;
     }
 }
