@@ -1,8 +1,8 @@
-DROP DATABASE IF EXISTS to_do_app;
+DROP DATABASE IF EXISTS to_do;
 
-CREATE DATABASE IF NOT EXISTS to_do_app;
+CREATE DATABASE IF NOT EXISTS to_do;
 
-USE to_do_app;
+USE to_do;
 
 CREATE TABLE IF NOT EXISTS user (
     username CHAR(16) NOT NULL UNIQUE,
@@ -22,7 +22,19 @@ INSERT INTO importance(flag, grade)
         ('No worry', 2),
         ('Normal', 3),
         ('Importance', 4),
-        ('Very importance', 5);        
+        ('Very importance', 5);
+
+CREATE TABLE IF NOT EXISTS frequency (
+    frequency_id TINYINT(2) AUTO_INCREMENT NOT NULL,
+    frequency CHAR(20),
+    PRIMARY KEY (frequency_id)
+);
+
+INSERT INTO frequency(frequency)
+    VALUES
+        ('Daily'),
+        ('Weekly'),
+        ('Monthly');
 
 
 CREATE TABLE IF NOT EXISTS task (
@@ -32,13 +44,15 @@ CREATE TABLE IF NOT EXISTS task (
     description TEXT,
     due_date DATE,
     added_date DATE,
-    iteration BOOLEAN DEFAULT FALSE,
+    frequency_id TINYINT(2) DEFAULT NULL,
     tag VARCHAR(255),
     completed TINYINT(1) DEFAULT FALSE,
     flag CHAR(50) DEFAULT 'None',
     PRIMARY KEY (task_id, username),
     FOREIGN KEY (username)
         REFERENCES user (username),
+    FOREIGN KEY (frequency_id)
+        REFERENCES frequency (frequency_id),
     FOREIGN KEY (flag) 
         REFERENCES importance (flag)
 );
@@ -76,12 +90,12 @@ INSERT INTO user (username, password)
 
 
 -- Add new task
--- INSERT INTO task (username, title)
---     VALUES 
---         ('root', 'Finish DB project'),
---         ('root', 'Complete Cloud computing course'),
---         ('admin', 'Complete discrete math'),
---         ('admin', 'Complete 2 hackerRank problems');
+INSERT INTO task (username, title)
+    VALUES 
+        ('root', 'Finish DB project'),
+        ('root', 'Complete Cloud computing course'),
+        ('admin', 'Complete discrete math'),
+        ('admin', 'Complete 2 hackerRank problems');
 
 
 -- Get user tasks

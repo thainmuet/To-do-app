@@ -1,41 +1,51 @@
-import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.SubScene;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.util.Objects;
 
+public class App {
 
-public class App extends Application {
+    private static final String NEW_TASK_WINDOW = "view/fxml/NewTask.fxml";
+    private static final String NEW_TASK_TITLE = "New task";
+    private Stage stage;
+    private User user = new User();
 
-    private static final String APP_NAME = "To-do";
-    private static final String APP_WINDOW_PATH = "view/App.fxml";
+    @FXML
+    private SubScene addTaskScene;
 
-    AuthorizationManager auth = new AuthorizationManager();
-
-    public static void main(String[] args) {
-        launch(args);
+    public void setStage(Stage stage) {
+        this.stage = stage;
     }
 
-    @Override
-    public void start(Stage window) {
-        DatabaseManager.loadDriver();
-        DatabaseManager.createDatabase();
-        launchApp();
-        auth.launchSignInWindow();
+    public void setUser(User user) {
+        this.user = user;
     }
 
-    private void launchApp() {
+    @FXML
+    public void launchAddTaskScene() {
         try {
-            Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource(APP_WINDOW_PATH)));
+            Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource(NEW_TASK_WINDOW)));
             Scene scene = new Scene(root);
             Stage appWindow = new Stage();
-            appWindow.setTitle(APP_NAME);
+            appWindow.setTitle(NEW_TASK_TITLE);
             appWindow.setScene(scene);
             appWindow.show();
         } catch (Exception e) {
             System.out.print("Can not load App window");
         }
     }
+
+    @FXML
+    public void addTask() {
+        System.out.println("Username: " + this.username.getText());
+        System.out.println(user.getUsername());
+        System.out.println(user.getPassword());
+    }
+
 }

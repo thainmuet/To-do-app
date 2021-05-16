@@ -4,11 +4,13 @@ import java.util.HashMap;
 
 public class DatabaseManager {
 
-    private static final String DB_NAME = "to_do_app";
-    private static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/to_do_app";
+    private static final String DB_NAME = "to_do";
+    private static final String DB_URL = "jdbc:mysql://localhost:3306/to_do";
     private static final String USERNAME = "root";
     private static final String PASSWORD = "Thai02032001";
+
+    private static Connection connection = null;
+    private static Statement statement = null;
 
     private static void printExceptionLog(SQLException e) {
         e.printStackTrace();
@@ -17,22 +19,21 @@ public class DatabaseManager {
         System.out.println("VendorError: " + e.getErrorCode());
     }
 
-    public static void loadDriver() {
-        try{
-            Class.forName(JDBC_DRIVER);
-        } catch (Exception e) {
-            e.printStackTrace();
+    public static void connect() {
+        try {
+            connection = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
+            System.out.println("Connect successfully!");
+        } catch (SQLException ex) {
+            printExceptionLog(ex);
         }
     }
 
     public static void createDatabase() {
 
-        try(Connection conn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD)) {
-            System.out.println("Connected");
-            Statement stmt = conn.createStatement();
+        try {
+            statement = connection.createStatement();
             String query = String.format("CREATE DATABASE IF NOT EXISTS %s;", DB_NAME);
-            stmt.executeUpdate(query);
-            System.out.println("Database created successfully!");
+            statement.executeUpdate(query);
         } catch (SQLException e) {
             printExceptionLog(e);
         }
@@ -40,10 +41,10 @@ public class DatabaseManager {
 
     public static HashMap<String, String> getUsers() {
         HashMap<String, String> users = new HashMap<>();
-        try(Connection conn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD)) {
-            Statement stmt = conn.createStatement();
+        try {
+            statement = connection.createStatement();
             String query = String.format("SELECT username, password FROM %s;", "user");
-            ResultSet rs = stmt.executeQuery(query);
+            ResultSet rs = statement.executeQuery(query);
             while(rs.next()) {
                 users.put(rs.getString("username"), rs.getString("password"));
             }
@@ -55,10 +56,10 @@ public class DatabaseManager {
 
     public static ArrayList<Task> getTasks(String username) {
         ArrayList<Task> tasks = new ArrayList<>();
-        try(Connection conn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD)) {
-            Statement stmt = conn.createStatement();
+        try {
+            statement  = connection.createStatement();
             String query = String.format("SELECT * FROM %s WHERE username='%s';", "task", username);
-            ResultSet rs = stmt.executeQuery(query);
+            ResultSet rs = statement.executeQuery(query);
             while(rs.next()) {
                 Task task = new Task(rs.getString("title"),
                         rs.getString("username"),
@@ -85,13 +86,13 @@ public class DatabaseManager {
     }
 
     public static boolean createAccount(String username, String password) {
-        try(Connection conn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD)) {
+        try {
             if (getUsers().containsKey(username)) {
                 return false;
             }
-            Statement stmt = conn.createStatement();
+            statement = connection.createStatement();
             String query = String.format("INSERT INTO %s (username, password) VALUES ('%s', '%s')", "user", username, password);
-            stmt.executeUpdate(query);
+            statement.executeUpdate(query);
         } catch (SQLException e) {
             printExceptionLog(e);
         }
@@ -111,6 +112,14 @@ public class DatabaseManager {
             System.out.println("SQLException: " + e.getMessage());
             System.out.println("SQLState: " + e.getSQLState());
             System.out.println("VendorError: " + e.getErrorCode());
+        }
+    }
+
+    public static void close() {
+        try {
+            connection.close();
+        } catch (SQLException throwable) {
+            throwable.printStackTrace();
         }
     }
 }

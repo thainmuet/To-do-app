@@ -6,16 +6,14 @@ import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.text.Text;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
-
-import java.util.Objects;
 
 public class AuthorizationManager {
 
-    private static final String LOGIN_WINDOW_PATH = "view/LogInWindow.fxml";
-    private static final String SIGNUP_WINDOW_PATH = "view/SignUpWindow.fxml";
-    private static final String LOGIN_WINDOW_TITLE = "Log in";
+    private static final String APP_NAME = "To-do";
+    private static final String APP_WINDOW_PATH = "view/fxml/App.fxml";
+    private static final String SIGN_UP_WINDOW_PATH = "view/fxml/SignUpWindow.fxml";
+    private static final String SIGN_UP_WINDOW_TITLE = "Sign up";
 
     @FXML
     private Text signUpWarning;
@@ -34,35 +32,38 @@ public class AuthorizationManager {
     @FXML
     private Button signUp;
 
-    private User user;
+    private Stage stage;
 
-    @FXML
-    public void launchSignInWindow() {
+    public void setStage(Stage stage) {
+        this.stage = stage;
+    }
+
+    private void launchAppWindow(User user) {
         try {
-            Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource(LOGIN_WINDOW_PATH)));
-            Scene scene = new Scene(root);
-            Stage signInStage = new Stage();
-            signInStage.initModality(Modality.APPLICATION_MODAL);
-            signInStage.setScene(scene);
-            signInStage.setTitle(LOGIN_WINDOW_TITLE);
-            signInStage.show();
+            FXMLLoader appLoader= new FXMLLoader(getClass().getResource(APP_WINDOW_PATH));
+            Parent appRoot = appLoader.load();
+            App controller = appLoader.getController();
+            controller.setStage(stage);
+            controller.setUser(user);
+            Scene scene=new Scene(appRoot);
+
+            stage.setTitle(APP_NAME);
+            stage.setScene(scene);
         } catch (Exception e) {
-            System.out.print("Can not open sign in window");
+            e.printStackTrace();
         }
     }
 
     @FXML
-    public void launchSignUpWindow() {
-        try {
-            Parent root = FXMLLoader.load(Objects.requireNonNull(AuthorizationManager.class.getResource(SIGNUP_WINDOW_PATH)));
-            Scene scene = new Scene(root);
-            Stage signUpStage = new Stage();
-            signUpStage.initModality(Modality.APPLICATION_MODAL);
-            signUpStage.setScene(scene);
-            signUpStage.setTitle(LOGIN_WINDOW_TITLE);
-            signUpStage.show();
-        } catch (Exception e) {
-            System.out.print("Can not open sign up window");
+    public void signIn() {
+        String username = signInUsername.getText();
+        String password = signInPassword.getText();
+        boolean isAuth = DatabaseManager.authorize(username, password);
+        if (isAuth) {
+            signInWarning.setVisible(false);
+            launchAppWindow(new User(username, password));
+        } else {
+            signInWarning.setVisible(true);
         }
     }
 
@@ -76,26 +77,21 @@ public class AuthorizationManager {
         } else {
             signUpWarning.setVisible(false);
             signUnStage.close();
+            launchAppWindow(new User(username, password));
         }
     }
 
     @FXML
-    public void signIn() {
-        String username = signInUsername.getText();
-        String password = signInPassword.getText();
-        boolean isAuth = DatabaseManager.authorize(username, password );
-        Stage signInStage = (Stage) signIn.getScene().getWindow();
-        if (isAuth) {
-            user = new User(username, password);
-            signInWarning.setVisible(false);
-            signInStage.close();
-        } else {
-            signInWarning.setVisible(true);
-        }
-        this.user.getTasks();
-    }
+    public void launchSignUpWindow() {
+        try {
+            FXMLLoader signUpLoader= new FXMLLoader(getClass().getResource(SIGN_UP_WINDOW_PATH));
+            Parent signUpRoot = signUpLoader.load();
+            Scene scene=new Scene(signUpRoot);
 
-    public User getUser() {
-        return this.user;
+            stage.setTitle(SIGN_UP_WINDOW_TITLE);
+            stage.setScene(scene);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
