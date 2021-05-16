@@ -102,3 +102,7 @@ INSERT INTO task (username, title)
 SELECT * FROM task WHERE username = 'root';
 
 SELECT * FROM task WHERE username = 'admin';
+
+UPDATE task
+SET title, description, added_date, due_date, tag, flag, completed, frequency_id, username
+WHERE task_id =

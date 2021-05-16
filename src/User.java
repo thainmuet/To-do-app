@@ -39,6 +39,7 @@ public class User {
 
     public void addTask(Task task) {
         this.tasks.add(task);
+        DatabaseManager.addNewTask(task, this.username);
     }
 
     public ArrayList<Task> getTasks() {

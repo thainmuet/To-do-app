@@ -61,7 +61,8 @@ public class DatabaseManager {
             String query = String.format("SELECT * FROM %s WHERE username='%s';", "task", username);
             ResultSet rs = statement.executeQuery(query);
             while(rs.next()) {
-                Task task = new Task(rs.getString("username"),
+                Task task = new Task(rs.getInt("task_id"),
+                        rs.getString("username"),
                         rs.getString("title"),
                         rs.getString("description"),
                         rs.getString("added_date"),
@@ -75,6 +76,40 @@ public class DatabaseManager {
             printExceptionLog(e);
         }
         return tasks;
+    }
+
+    public static void addNewTask(Task task, String username) {
+        try {
+            statement = connection.createStatement();
+            String title = task.getTitle();
+            String des = task.getDescription();
+            String query = String.format("INSERT INTO task (username, title, description) VALUES ('%s', '%s', '%s')", username, title, des);
+            statement.executeUpdate(query);
+        } catch (SQLException e) {
+            printExceptionLog(e);
+        }
+
+    }
+
+    public static void editTask(Task task) {
+        int id = task.getId();
+        String username = task.getUsername();
+        String title = task.getTitle();
+        String des = task.getDescription();
+        String dueDate = task.getDueDate();
+        String tag = task.getTag();
+        String flag = task.getFlag();
+        boolean completed = task.getCompleted();
+
+        String format = "UPDATE task SET title='%s', description='%s', tag='%s', flag='%s', completed=%b WHERE task_id=%d AND username='%s'";
+        String query = String.format(format, title, des, tag, flag, completed, id, username);
+
+        try {
+            statement = connection.createStatement();
+            statement.executeUpdate(query);
+        } catch (SQLException e) {
+            printExceptionLog(e);
+        }
     }
 
     public static boolean authorize(String username, String password) {

@@ -33,13 +33,8 @@ public class AuthorizationManager {
     @FXML
     private Button signUp;
 
-    private final User user;
+    private User user = null;
     public boolean isValid;
-
-    public AuthorizationManager() {
-        this.user = new User();
-        this.isValid = false;
-    }
 
     public AuthorizationManager launchSignInWindow() {
         FXMLLoader signInLoader= new FXMLLoader(getClass().getResource(SIGN_IN_WINDOW_PATH));
@@ -63,12 +58,13 @@ public class AuthorizationManager {
         Stage signInStage = (Stage) signIn.getScene().getWindow();
         isValid = DatabaseManager.authorize(username, password);
         if (isValid) {
-            this.user.setInfo(username, password);
+            this.user = new User(username, password);
             signInWarning.setVisible(false);
             signInStage.close();
         } else {
             signInWarning.setVisible(true);
         }
+        System.out.println(this.user.getUsername());
     }
 
     @FXML
