@@ -1,3 +1,5 @@
+import java.time.format.DateTimeFormatter;
+
 public class Task {
     private int id;
     private String username;
@@ -17,6 +19,7 @@ public class Task {
         this.title = title;
         this.description = description;
         this.frequency = frequency;
+        this.addedDate =
         this.dueDate = dueDate;
         this.tag = tag;
         this.flag = flag;

@@ -1,9 +1,11 @@
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class User {
     private String username;
     private String password;
-    private ArrayList<Task> tasks;
+    private HashMap<Integer, Task> tasks;
     private ArrayList<Project> projects;
 
     public User() {}
@@ -11,7 +13,7 @@ public class User {
     public User(String username, String password) {
         this.username = username;
         this.password = password;
-        this.tasks = new ArrayList<>();
+        this.tasks = new HashMap<>();
         tasks = DatabaseManager.getTasks(username);
         this.projects = new ArrayList<>();
     }
@@ -38,15 +40,16 @@ public class User {
     }
 
     public void addTask(Task task) {
-        this.tasks.add(task);
+        this.tasks.put(task.getId(), task);
         DatabaseManager.addNewTask(task, this.username);
     }
 
-    public void deleteTask(Task task) {
-        this.tasks.remove(task);
+    public void deleteTask(int taskId) {
+        this.tasks.remove(taskId);
+        DatabaseManager.deleteTask(taskId);
     }
 
-    public ArrayList<Task> getTasks() {
-        return tasks;
+    public HashMap<Integer, Task> getTasks() {
+        return this.tasks;
     }
 }

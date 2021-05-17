@@ -57,8 +57,8 @@ public class DatabaseManager {
         return users;
     }
 
-    public static ArrayList<Task> getTasks(String username) {
-        ArrayList<Task> tasks = new ArrayList<>();
+    public static HashMap<Integer, Task> getTasks(String username) {
+        HashMap<Integer, Task> tasks = new HashMap<>();
         try {
             statement  = connection.createStatement();
             String query = String.format("SELECT * FROM %s WHERE username='%s';", "task", username);
@@ -74,7 +74,7 @@ public class DatabaseManager {
                         resultSet.getString("tag"),
                         resultSet.getString("flag"),
                         resultSet.getBoolean("completed"));
-                tasks.add(task);
+                tasks.put(task.getId(), task);
             }
         } catch (SQLException e) {
             printExceptionLog(e);
@@ -165,14 +165,15 @@ public class DatabaseManager {
         int id = task.getId();
         String title = task.getTitle();
         String des = task.getDescription();
+        String addedDate = task.getAddedDate();
         String frequency = task.getFrequency();
         String dueDate = task.getDueDate();
         String tag = task.getTag();
         String flag = task.getFlag();
         boolean completed = task.getCompleted();
 
-        String format = "UPDATE task SET title='%s', description='%s', due_date='%s', frequency='%s', tag='%s', flag='%s', completed=%b WHERE task_id=%d";
-        String query = String.format(format, title, des, dueDate, frequency, tag, flag, completed, id);
+        String format = "UPDATE task SET title='%s', description='%s', added_date='%s', due_date='%s', frequency='%s', tag='%s', flag='%s', completed=%b WHERE task_id=%d";
+        String query = String.format(format, title, des, addedDate, dueDate, frequency, tag, flag, completed, id);
         System.out.println(query);
 
         try {

@@ -19,6 +19,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 
 
 public class App extends Application {
@@ -72,13 +73,13 @@ public class App extends Application {
     }
 
     @FXML public void addTask() {
-        String title = this.newTaskTitle.getText();
-        String des = this.newTaskDescription.getText();
-        if (!title.equals("") || !des.equals("")) {
+        String title = newTaskTitle.getText();
+        String des = newTaskDescription.getText();
+        if (!title.equals("")) {
             String addedDate = formatter.format(LocalDateTime.now());
             Task task = new Task(App.user.getUsername(), title, des, addedDate);
             this.taskList.getItems().add(task.getTitle());
-            App.user.addTask(task);
+            user.addTask(task);
             updateTaskList();
         }
     }
@@ -86,10 +87,12 @@ public class App extends Application {
     @FXML public void launchEditTaskPane() {
         if (!taskList.getItems().isEmpty()) {
             String taskTitle = taskList.getSelectionModel().getSelectedItem();
-            ArrayList<Task> tasks = user.getTasks();
+            HashMap<Integer, Task> tasks = user.getTasks();
 
             int taskId = 0;
-            for (Task task : tasks) {
+            for (Map.Entry<Integer, Task> entry : tasks.entrySet()) {
+                Task task = entry.getValue();
+                task.printTaskAttributes();
                 taskId += 1;
                 if (task.getTitle().equals(taskTitle)) {
                     this.taskId.setText(Integer.toString(taskId));
@@ -115,6 +118,7 @@ public class App extends Application {
         int id = taskIdMap.get(Integer.parseInt(this.taskId.getText()));
         String title = this.taskToEditTitle.getText();
         String des = this.taskToEditDescription.getText();
+        String addedDate = this.taskToEditAddedDate.getText();
         String dueDate = (this.taskToEditDueDate.getValue()).format(formatter);
         String frequency = this.taskToEditFrequency.getValue();
         String tag = this.taskToEditTag.getText();
@@ -125,8 +129,10 @@ public class App extends Application {
         if (DatabaseManager.getDateDif(id, dueDate) < 0) {
             this.dueDateWarning.setVisible(true);
         } else {
-            Task task = new Task(id, App.user.getUsername(), title, des, frequency, dueDate, tag, flag, completed);
+            Task task = new Task(id, App.user.getUsername(), title, des, addedDate, frequency, dueDate, tag, flag, completed);
             DatabaseManager.editTask(task);
+            user.deleteTask(id);
+            user.addTask(task);
 
             this.dueDateWarning.setVisible(false);
             updateTaskList();
@@ -135,18 +141,14 @@ public class App extends Application {
 
     @FXML public void deleteTask() {
         int id = taskIdMap.get(Integer.parseInt(taskId.getText()));
-        user.deleteTask();
-        DatabaseManager.deleteTask(id);
+        user.deleteTask(id);
         updateTaskList();
     }
 
     public void updateTaskList() {
         ArrayList<String> frequencies = DatabaseManager.getFrequencies();
         ArrayList<String> flags = DatabaseManager.getFlags();
-        ArrayList<Task> tasks = user.getTasks();
-        for (Task task : tasks) {
-            System.out.println(task.getTitle());
-        }
+        HashMap<Integer, Task> tasks = user.getTasks();
         HashSet<Integer> ids = new HashSet<>();
 
         int taskId = 0;
@@ -163,12 +165,12 @@ public class App extends Application {
                 this.taskToEditFlag.getItems().add(flag);
             }
         }
-        for (Task task : tasks) {
-            if (!ids.contains(task.getId())) {
+        for (Map.Entry<Integer, Task> entry : tasks.entrySet()) {
+            if (!ids.contains(entry.getKey())) {
                 taskId += 1;
-                ids.add(task.getId());
-                this.taskIdMap.put(taskId, task.getId());
-                this.taskList.getItems().add(task.getTitle());
+                ids.add(entry.getValue().getId());
+                taskIdMap.put(taskId, entry.getKey());
+                this.taskList.getItems().add(entry.getValue().getTitle());
             }
         }
 
