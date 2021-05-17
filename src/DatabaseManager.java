@@ -1,4 +1,6 @@
 import java.sql.*;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -191,20 +193,26 @@ public class DatabaseManager {
         }
     }
 
-    public static void checkDateConstraint(int taskId, String dueDate) {
+    public static int getDateDif(int taskId, String dueDate) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String query = String.format("SELECT added_date FROM task WHERE task_id=%d", taskId);
+        String addedDate = null;
 
         try {
             statement = connection.createStatement();
             resultSet = statement.executeQuery(query);
 
             if (resultSet.next()) {
-                String addedDate = resultSet.getString("added_date");
+                addedDate = resultSet.getString("added_date");
             }
-
         } catch (SQLException e) {
             printExceptionLog(e);
         }
+
+        assert addedDate != null;
+        LocalDate addedLocalDate = LocalDate.parse(addedDate, formatter);
+        LocalDate dueLocalDate = LocalDate.parse(dueDate, formatter);
+        return dueLocalDate.compareTo(addedLocalDate);
     }
 
     public static void close() {

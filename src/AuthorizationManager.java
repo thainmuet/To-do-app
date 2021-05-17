@@ -61,6 +61,7 @@ public class AuthorizationManager {
             this.user = new User(username, password);
             signInWarning.setVisible(false);
             signInStage.close();
+            App.launchAppWindow(this.user);
         } else {
             signInWarning.setVisible(true);
         }

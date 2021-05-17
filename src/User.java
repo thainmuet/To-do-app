@@ -42,6 +42,10 @@ public class User {
         DatabaseManager.addNewTask(task, this.username);
     }
 
+    public void deleteTask(Task task) {
+        this.tasks.remove(task);
+    }
+
     public ArrayList<Task> getTasks() {
         return tasks;
     }

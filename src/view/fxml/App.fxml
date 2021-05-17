@@ -4,6 +4,7 @@
 <?import com.jfoenix.controls.JFXCheckBox?>
 <?import com.jfoenix.controls.JFXComboBox?>
 <?import com.jfoenix.controls.JFXListView?>
+<?import com.jfoenix.controls.JFXTreeView?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
@@ -12,19 +13,16 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="620.0" prefWidth="785.0" style="-fx-background-color: ffffff;" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="App">
-   <VBox layoutX="68.0" layoutY="286.0" maxHeight="550.0" maxWidth="300.0" minHeight="550.0" minWidth="300.0" prefHeight="550.0" prefWidth="300.0" style="-fx-background-color: #fafafa;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="40.0">
+   <VBox fx:id="menu" layoutX="68.0" layoutY="286.0" maxHeight="550.0" maxWidth="300.0" minHeight="550.0" minWidth="300.0" prefHeight="550.0" prefWidth="300.0" style="-fx-background-color: #fafafa;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="40.0">
       <JFXButton onAction="#updateTaskList" prefHeight="35.0" prefWidth="300.0" stylesheets="@../css/style.css" text="Tasks">
          <VBox.margin>
             <Insets />
          </VBox.margin>
       </JFXButton>
-      <JFXButton prefHeight="35.0" prefWidth="300.0" text="Projects">
-         <VBox.margin>
-            <Insets />
-         </VBox.margin>
-      </JFXButton>
+      <JFXTreeView fx:id="menuTree" />
    </VBox>
    <AnchorPane layoutX="545.0" layoutY="240.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="300.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="40.0">
       <Label layoutX="337.0" layoutY="74.0" text="Projects" visible="false" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="0.0">
@@ -50,36 +48,47 @@
                <Font size="14.0" />
             </font>
          </Label>
-         <Label layoutX="49.0" layoutY="207.0" text="Due date:" AnchorPane.leftAnchor="40.0" AnchorPane.topAnchor="207.0">
+         <Label layoutX="40.0" layoutY="236.0" text="Due date:" AnchorPane.leftAnchor="40.0" AnchorPane.topAnchor="236.0">
             <font>
                <Font size="14.0" />
             </font>
          </Label>
-         <Label layoutX="40.0" layoutY="257.0" text="Frequency:" AnchorPane.leftAnchor="40.0" AnchorPane.topAnchor="257.0">
+         <Label layoutX="33.0" layoutY="280.0" text="Frequency:" AnchorPane.leftAnchor="40.0" AnchorPane.topAnchor="280.0">
             <font>
                <Font size="14.0" />
             </font>
          </Label>
-         <Label layoutX="40.0" layoutY="314.0" text="Tag:" AnchorPane.leftAnchor="40.0" AnchorPane.topAnchor="314.0">
+         <Label layoutX="40.0" layoutY="331.0" text="Tag:" AnchorPane.leftAnchor="40.0" AnchorPane.topAnchor="331.0">
             <font>
                <Font size="14.0" />
             </font>
          </Label>
-         <Label layoutX="40.0" layoutY="371.0" text="Flag:" AnchorPane.leftAnchor="40.0" AnchorPane.topAnchor="371.0">
+         <Label layoutX="41.0" layoutY="378.0" text="Flag:" AnchorPane.leftAnchor="41.0" AnchorPane.topAnchor="378.0">
             <font>
                <Font size="14.0" />
             </font>
          </Label>
          <TextField fx:id="taskToEditTitle" layoutX="149.0" layoutY="24.0" prefHeight="24.0" prefWidth="201.0" promptText="(required)" AnchorPane.leftAnchor="149.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="24.0" />
-         <TextArea fx:id="taskToEditDescription" layoutX="149.0" layoutY="67.0" prefHeight="120.0" prefWidth="206.0" promptText="(required)" AnchorPane.bottomAnchor="303.0" AnchorPane.leftAnchor="149.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="67.0" />
-         <DatePicker fx:id="taskToEditDueDate" editable="false" layoutX="149.0" layoutY="207.0" AnchorPane.leftAnchor="149.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="207.0" />
-         <JFXComboBox fx:id="taskToEditFrequency" layoutX="149.0" layoutY="257.0" prefHeight="24.0" prefWidth="195.0" AnchorPane.leftAnchor="149.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="257.0" />
-         <TextField fx:id="taskToEditTag" layoutX="149.0" layoutY="314.0" AnchorPane.leftAnchor="149.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="314.0" />
+         <TextArea fx:id="taskToEditDescription" layoutX="149.0" layoutY="67.0" prefHeight="103.0" prefWidth="206.0" promptText="(required)" AnchorPane.bottomAnchor="320.0" AnchorPane.leftAnchor="149.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="67.0" />
+         <DatePicker fx:id="taskToEditDueDate" editable="false" layoutX="149.0" layoutY="233.0" prefHeight="24.0" prefWidth="206.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="233.0" />
+         <JFXComboBox fx:id="taskToEditFrequency" layoutX="160.0" layoutY="277.0" prefHeight="24.0" prefWidth="206.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="277.0" />
+         <TextField fx:id="taskToEditTag" layoutX="147.0" layoutY="328.0" prefHeight="24.0" prefWidth="206.0" AnchorPane.rightAnchor="32.0" AnchorPane.topAnchor="328.0" />
          <JFXButton layoutX="309.0" layoutY="456.0" onAction="#editTask" prefHeight="28.0" prefWidth="70.0" text="Save" AnchorPane.topAnchor="455.0" />
          <JFXButton layoutX="239.0" layoutY="454.0" onAction="#updateTaskList" prefHeight="28.0" prefWidth="70.0" text="Cancel" AnchorPane.topAnchor="455.0" />
          <JFXCheckBox fx:id="isCompleted" layoutX="37.0" layoutY="459.0" text="Completed" />
          <JFXButton layoutX="169.0" layoutY="455.0" onAction="#deleteTask" prefHeight="28.0" prefWidth="70.0" ripplerFill="RED" text="Delete" textFill="RED" AnchorPane.topAnchor="455.0" />
-         <JFXComboBox fx:id="taskToEditFlag" layoutX="149.0" layoutY="368.0" prefHeight="24.0" prefWidth="195.0" AnchorPane.leftAnchor="149.0" AnchorPane.rightAnchor="30.0" />
+         <JFXComboBox fx:id="taskToEditFlag" layoutX="149.0" layoutY="375.0" prefHeight="24.0" prefWidth="206.0" AnchorPane.rightAnchor="30.0" />
+         <Label layoutX="33.0" layoutY="192.0" text="Added date:" AnchorPane.leftAnchor="40.0">
+            <font>
+               <Font size="14.0" />
+            </font>
+         </Label>
+         <TextField fx:id="taskToEditAddedDate" editable="false" layoutX="147.0" layoutY="189.0" prefHeight="24.0" prefWidth="206.0" />
+         <Text fx:id="dueDateWarning" fill="RED" layoutX="148.0" layoutY="270.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Due date can not be before added date!" visible="false" AnchorPane.rightAnchor="30.0">
+            <font>
+               <Font size="10.0" />
+            </font>
+         </Text>
       </AnchorPane>
       <AnchorPane fx:id="addTaskPane" prefHeight="200.0" prefWidth="200.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="50.0" AnchorPane.topAnchor="60.0">
          <Label text="Title:" AnchorPane.leftAnchor="40.0" AnchorPane.topAnchor="27.0" />
