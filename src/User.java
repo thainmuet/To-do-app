@@ -41,6 +41,7 @@ public class User {
 
     public void addTask(Task task) {
         this.tasks.put(task.getId(), task);
+        System.out.println("44: " + tasks.size());
         DatabaseManager.addNewTask(task, this.username);
     }
 
@@ -50,6 +51,6 @@ public class User {
     }
 
     public HashMap<Integer, Task> getTasks() {
-        return this.tasks;
+        return DatabaseManager.getTasks(this.username);
     }
 }

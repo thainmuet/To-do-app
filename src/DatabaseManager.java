@@ -174,7 +174,6 @@ public class DatabaseManager {
 
         String format = "UPDATE task SET title='%s', description='%s', added_date='%s', due_date='%s', frequency='%s', tag='%s', flag='%s', completed=%b WHERE task_id=%d";
         String query = String.format(format, title, des, addedDate, dueDate, frequency, tag, flag, completed, id);
-        System.out.println(query);
 
         try {
             statement = connection.createStatement();
@@ -199,12 +198,14 @@ public class DatabaseManager {
         String query = String.format("SELECT added_date FROM task WHERE task_id=%d", taskId);
         String addedDate = null;
 
+        System.out.println("201: " + query);
         try {
             statement = connection.createStatement();
             resultSet = statement.executeQuery(query);
 
-            if (resultSet.next()) {
+            while (resultSet.next()) {
                 addedDate = resultSet.getString("added_date");
+                System.out.println("208: " + addedDate);
             }
         } catch (SQLException e) {
             printExceptionLog(e);
@@ -214,6 +215,22 @@ public class DatabaseManager {
         LocalDate addedLocalDate = LocalDate.parse(addedDate, formatter);
         LocalDate dueLocalDate = LocalDate.parse(dueDate, formatter);
         return dueLocalDate.compareTo(addedLocalDate);
+    }
+
+    public static int getHighestTaskId() {
+        String query = String.format("SELECT MAX(task_id) FROM %s", "task");
+        int id = 0;
+        try {
+            statement = connection.createStatement();
+            resultSet = statement.executeQuery(query);
+            while (resultSet.next()) {
+                id = resultSet.getInt("MAX(task_id)");
+            }
+        } catch (SQLException e) {
+            printExceptionLog(e);
+        }
+
+        return id;
     }
 
     public static void close() {

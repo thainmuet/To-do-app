@@ -26,7 +26,7 @@ public class Task {
         this.completed = completed;
     }
 
-    public Task(String username, String title,  String description, String addedDate) {
+    public Task(int id, String username, String title,  String description, String addedDate) {
         this.title = title;
         this.description = description;
         this.username = username;
@@ -95,5 +95,45 @@ public class Task {
 
     public Boolean getCompleted() {
         return completed;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setAddedDate(String addedDate) {
+        this.addedDate = addedDate;
+    }
+
+    public void setFrequency(String frequency) {
+        this.frequency = frequency;
+    }
+
+    public void setDueDate(String dueDate) {
+        this.dueDate = dueDate;
+    }
+
+    public void setTag(String tag) {
+        this.tag = tag;
+    }
+
+    public void setFlag(String flag) {
+        this.flag = flag;
+    }
+
+    public void setCompleted(Boolean completed) {
+        this.completed = completed;
     }
 }

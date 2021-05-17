@@ -98,8 +98,4 @@ public class AuthorizationManager {
             e.printStackTrace();
         }
     }
-
-    public User getUser() {
-        return this.user;
-    }
 }
