@@ -25,13 +25,13 @@ INSERT INTO importance(flag, grade)
         ('Very importance', 5);
 
 CREATE TABLE IF NOT EXISTS frequency (
-    frequency_id TINYINT(2) AUTO_INCREMENT NOT NULL,
-    frequency CHAR(20),
-    PRIMARY KEY (frequency_id)
+    frequency CHAR(20) NOT NULL,
+    PRIMARY KEY (frequency)
 );
 
 INSERT INTO frequency(frequency)
     VALUES
+        ('None'),
         ('Daily'),
         ('Weekly'),
         ('Monthly');
@@ -44,15 +44,15 @@ CREATE TABLE IF NOT EXISTS task (
     description TEXT,
     due_date DATE,
     added_date DATE,
-    frequency_id TINYINT(2) DEFAULT NULL,
+    frequency CHAR(20) DEFAULT 'None',
     tag VARCHAR(255),
     completed TINYINT(1) DEFAULT FALSE,
     flag CHAR(50) DEFAULT 'None',
     PRIMARY KEY (task_id, username),
     FOREIGN KEY (username)
         REFERENCES user (username),
-    FOREIGN KEY (frequency_id)
-        REFERENCES frequency (frequency_id),
+    FOREIGN KEY (frequency)
+        REFERENCES frequency (frequency),
     FOREIGN KEY (flag) 
         REFERENCES importance (flag)
 );
@@ -102,7 +102,3 @@ INSERT INTO task (username, title)
 SELECT * FROM task WHERE username = 'root';
 
 SELECT * FROM task WHERE username = 'admin';
-
-UPDATE task
-SET title, description, added_date, due_date, tag, flag, completed, frequency_id, username
-WHERE task_id =

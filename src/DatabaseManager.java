@@ -11,6 +11,7 @@ public class DatabaseManager {
 
     private static Connection connection = null;
     private static Statement statement = null;
+    private static ResultSet resultSet = null;
 
     private static void printExceptionLog(SQLException e) {
         e.printStackTrace();
@@ -59,17 +60,18 @@ public class DatabaseManager {
         try {
             statement  = connection.createStatement();
             String query = String.format("SELECT * FROM %s WHERE username='%s';", "task", username);
-            ResultSet rs = statement.executeQuery(query);
-            while(rs.next()) {
-                Task task = new Task(rs.getInt("task_id"),
-                        rs.getString("username"),
-                        rs.getString("title"),
-                        rs.getString("description"),
-                        rs.getString("added_date"),
-                        rs.getString("added_date"),
-                        rs.getString("tag"),
-                        rs.getString("flag"),
-                        rs.getBoolean("completed"));
+            resultSet = statement.executeQuery(query);
+            while(resultSet.next()) {
+                Task task = new Task(resultSet.getInt("task_id"),
+                        resultSet.getString("username"),
+                        resultSet.getString("title"),
+                        resultSet.getString("description"),
+                        resultSet.getString("added_date"),
+                        resultSet.getString("frequency"),
+                        resultSet.getString("due_date"),
+                        resultSet.getString("tag"),
+                        resultSet.getString("flag"),
+                        resultSet.getBoolean("completed"));
                 tasks.add(task);
             }
         } catch (SQLException e) {
@@ -78,38 +80,46 @@ public class DatabaseManager {
         return tasks;
     }
 
-    public static void addNewTask(Task task, String username) {
+    public static ArrayList<String> getFlags() {
+        ArrayList<String> flags = new ArrayList<>();
         try {
-            statement = connection.createStatement();
-            String title = task.getTitle();
-            String des = task.getDescription();
-            String query = String.format("INSERT INTO task (username, title, description) VALUES ('%s', '%s', '%s')", username, title, des);
-            statement.executeUpdate(query);
+            statement  = connection.createStatement();
+            String query = String.format("SELECT flag FROM %s", "importance");
+            resultSet = statement.executeQuery(query);
+            while(resultSet.next()) {
+                flags.add(resultSet.getString("flag"));
+            }
         } catch (SQLException e) {
             printExceptionLog(e);
         }
-
+        return flags;
     }
 
-    public static void editTask(Task task) {
-        int id = task.getId();
-        String username = task.getUsername();
-        String title = task.getTitle();
-        String des = task.getDescription();
-        String dueDate = task.getDueDate();
-        String tag = task.getTag();
-        String flag = task.getFlag();
-        boolean completed = task.getCompleted();
-
-        String format = "UPDATE task SET title='%s', description='%s', tag='%s', flag='%s', completed=%b WHERE task_id=%d AND username='%s'";
-        String query = String.format(format, title, des, tag, flag, completed, id, username);
-
+    public static ArrayList<String> getFrequencies() {
+        ArrayList<String> frequencies = new ArrayList<>();
         try {
-            statement = connection.createStatement();
-            statement.executeUpdate(query);
+            statement  = connection.createStatement();
+            String query = String.format("SELECT frequency FROM %s", "frequency");
+            resultSet = statement.executeQuery(query);
+            while(resultSet.next()) {
+                frequencies.add(resultSet.getString("frequency"));
+            }
         } catch (SQLException e) {
             printExceptionLog(e);
         }
+        return frequencies;
+    }
+
+    public static int getFlagPoint(String flag) {
+        String query = String.format("SELECT point FROM importance WHERE flag='%s'", flag);
+        int point = 0;
+        try {
+            statement = connection.createStatement();
+            point = statement.executeUpdate(query);
+        } catch (SQLException e) {
+            printExceptionLog(e);
+        }
+        return point;
     }
 
     public static boolean authorize(String username, String password) {
@@ -134,19 +144,66 @@ public class DatabaseManager {
         return true;
     }
 
-    public static void executeUpdate(String query) {
-        Statement st = null;
-        ResultSet rs = null;
-
-        try(Connection conn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD)) {
-            System.out.println("Connected");
-            st = conn.createStatement();
-            st.executeUpdate(query);
-            System.out.println("Updated OK!");
+    public static void addNewTask(Task task, String username) {
+        try {
+            statement = connection.createStatement();
+            String title = task.getTitle();
+            String des = task.getDescription();
+            String addedDate = task.getAddedDate();
+            String format = "INSERT INTO task (username, title, description, added_date) VALUES ('%s', '%s', '%s', '%s')";
+            String query = String.format(format, username, title, des, addedDate);
+            statement.executeUpdate(query);
         } catch (SQLException e) {
-            System.out.println("SQLException: " + e.getMessage());
-            System.out.println("SQLState: " + e.getSQLState());
-            System.out.println("VendorError: " + e.getErrorCode());
+            printExceptionLog(e);
+        }
+
+    }
+
+    public static void editTask(Task task) {
+        int id = task.getId();
+        String title = task.getTitle();
+        String des = task.getDescription();
+        String frequency = task.getFrequency();
+        String dueDate = task.getDueDate();
+        String tag = task.getTag();
+        String flag = task.getFlag();
+        boolean completed = task.getCompleted();
+
+        String format = "UPDATE task SET title='%s', description='%s', due_date='%s', frequency='%s', tag='%s', flag='%s', completed=%b WHERE task_id=%d";
+        String query = String.format(format, title, des, dueDate, frequency, tag, flag, completed, id);
+        System.out.println(query);
+
+        try {
+            statement = connection.createStatement();
+            statement.executeUpdate(query);
+        } catch (SQLException e) {
+            printExceptionLog(e);
+        }
+    }
+
+    public static void deleteTask(int taskId) {
+        String query = String.format("DELETE FROM task WHERE task_id=%d", taskId);
+        try {
+            statement = connection.createStatement();
+            statement.executeUpdate(query);
+        } catch (SQLException e) {
+            printExceptionLog(e);
+        }
+    }
+
+    public static void checkDateConstraint(int taskId, String dueDate) {
+        String query = String.format("SELECT added_date FROM task WHERE task_id=%d", taskId);
+
+        try {
+            statement = connection.createStatement();
+            resultSet = statement.executeQuery(query);
+
+            if (resultSet.next()) {
+                String addedDate = resultSet.getString("added_date");
+            }
+
+        } catch (SQLException e) {
+            printExceptionLog(e);
         }
     }
 

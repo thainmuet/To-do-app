@@ -4,10 +4,24 @@ public class Task {
     private String title;
     private String description;
     private String addedDate;
+
+    private String frequency;
     private String dueDate;
     private String tag;
     private String flag;
     private Boolean completed = false;
+
+    public Task(int id, String username, String title, String description, String frequency, String dueDate, String tag, String flag, Boolean completed) {
+        this.id = id;
+        this.username = username;
+        this.title = title;
+        this.description = description;
+        this.frequency = frequency;
+        this.dueDate = dueDate;
+        this.tag = tag;
+        this.flag = flag;
+        this.completed = completed;
+    }
 
     public Task(String username, String title,  String description, String addedDate) {
         this.title = title;
@@ -16,72 +30,13 @@ public class Task {
         this.addedDate = addedDate;
     }
 
-    public Task(int id,
-                String username,
-                String title,
-                String description,
-                String addedDate,
-                String dueDate,
-                String tag,
-                String flag,
-                Boolean completed) {
-        this.id = id;
-        this.title = title;
-        this.username = username;
-        this.description = description;
-        this.addedDate = addedDate;
-        this.dueDate = dueDate;
-        this.tag = tag;
-        this.flag = flag;
-        this.completed = completed;
-    }
-
-    public Task(int id,
-                String username,
-                String title,
-                String description,
-                String dueDate,
-                String tag,
-                String flag,
-                Boolean completed) {
+    public Task(int id, String username, String title, String description, String addedDate, String frequency, String dueDate, String tag, String flag, Boolean completed) {
         this.id = id;
         this.username = username;
         this.title = title;
         this.description = description;
-        this.dueDate = dueDate;
-        this.tag = tag;
-        this.flag = flag;
-        this.completed = completed;
-    }
-
-    public Task(String username,
-                String title,
-                String description,
-                String addedDate,
-                String dueDate,
-                String tag,
-                String flag,
-                boolean completed) {
-        this.title = title;
-        this.username = username;
-        this.description = description;
         this.addedDate = addedDate;
-        this.dueDate = dueDate;
-        this.tag = tag;
-        this.flag = flag;
-        this.completed = completed;
-    }
-
-    public Task(String username,
-                String title,
-                String description,
-                String dueDate,
-                String tag,
-                String flag,
-                Boolean completed) {
-        this.title = title;
-        this.username = username;
-        this.description = description;
+        this.frequency = frequency;
         this.dueDate = dueDate;
         this.tag = tag;
         this.flag = flag;
@@ -109,6 +64,10 @@ public class Task {
 
     public String getUsername() {
         return username;
+    }
+
+    public String getFrequency() {
+        return frequency;
     }
 
     public String getAddedDate() {

@@ -1,25 +1,21 @@
-import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXCheckBox;
+import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXListView;
 import javafx.application.Application;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.SubScene;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Objects;
 
 
 public class App extends Application {
@@ -30,9 +26,9 @@ public class App extends Application {
     private static final String ADMIN_USERNAME = "root";
     private static final String ADMIN_PASSWORD = "toor";
 
+    @FXML protected JFXListView<String> taskList = new JFXListView<>();
     @FXML private Label taskId;
     @FXML private Label sceneTitle;
-    @FXML private JFXListView<String> taskList = new JFXListView<>();
     @FXML private AnchorPane addTaskPane;
     @FXML private AnchorPane editTaskPane;
     @FXML private TextField newTaskTitle;
@@ -41,12 +37,14 @@ public class App extends Application {
     @FXML private TextField taskToEditTitle;
     @FXML private TextArea taskToEditDescription;
     @FXML private TextField taskToEditTag;
-    @FXML private TextField taskToEditFlag;
+    @FXML private JFXComboBox<String> taskToEditFlag;
+    @FXML private JFXComboBox<String> taskToEditFrequency;
     @FXML private JFXCheckBox isCompleted;
 
     private User user = null;
     private final AuthorizationManager auth = new AuthorizationManager();
-    private HashMap<Integer, Integer> taskIdMap = new HashMap<>();
+    private final HashMap<Integer, Integer> taskIdMap = new HashMap<>();
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     public static void main(String[] args) {
         launch(args);
@@ -69,45 +67,40 @@ public class App extends Application {
         this.taskList.setVisible(false);
     }
 
-    @FXML public void closeAddTaskPane() {
-        this.addTaskPane.setVisible(false);
-        this.taskList.setVisible(true);
-    }
-
     @FXML public void addTask() {
         String title = this.newTaskTitle.getText();
         String des = this.newTaskDescription.getText();
-        String addedDate = LocalDateTime.now().toString();
         if (!title.equals("") || !des.equals("")) {
+            String addedDate = formatter.format(LocalDateTime.now());
             Task task = new Task(this.user.getUsername(), title, des, addedDate);
             this.taskList.getItems().add(task.getTitle());
             this.user.addTask(task);
-            closeAddTaskPane();
+            updateTaskList();
         }
     }
 
-    @FXML public void showTasks() {
-        this.user = new User(ADMIN_USERNAME, ADMIN_PASSWORD);
-        loadUserTasks();
-    }
-
     @FXML public void launchEditTaskPane() {
-        taskList.setVisible(false);
         String taskTitle = taskList.getSelectionModel().getSelectedItem();
         ArrayList<Task> tasks = user.getTasks();
+
         int taskId = 0;
         for (Task task : tasks) {
             taskId += 1;
             if (task.getTitle().equals(taskTitle)) {
                 this.taskId.setText(Integer.toString(taskId));
                 this.taskToEditTitle.setText(task.getTitle());
-                this.taskToEditDescription.setText(task.getDescription());
-                this.taskToEditTag.setText(task.getTag());
-                this.taskToEditFlag.setText(task.getFlag());
+                this.taskToEditDescription.setText(task.getDescription() == null ? "" : task.getDescription());
+                String dueDate = task.getDueDate();
+                this.taskToEditDueDate.setValue(dueDate != null ? LocalDate.parse(dueDate, formatter) : LocalDate.parse(LocalDateTime.now().format(formatter)));
+                this.taskToEditTag.setText(task.getTag() == null ? "" : task.getTag());
+                this.taskToEditFrequency.setValue(task.getFrequency());
+                this.taskToEditFlag.getSelectionModel().select(task.getFlag());
                 this.isCompleted.setSelected(task.getCompleted());
                 break;
             }
         }
+
+        taskList.setVisible(false);
         editTaskPane.setVisible(true);
     }
 
@@ -115,34 +108,46 @@ public class App extends Application {
         int id = taskIdMap.get(Integer.parseInt(this.taskId.getText()));
         String title = this.taskToEditTitle.getText();
         String des = this.taskToEditDescription.getText();
-        String dueDate = this.taskToEditDueDate.getChronology().toString();
+        String dueDate = (this.taskToEditDueDate.getValue()).format(formatter);
+        String frequency = this.taskToEditFrequency.getValue();
         String tag = this.taskToEditTag.getText();
-        String flag = this.taskToEditFlag.getText();
+        String flag = this.taskToEditFlag.getValue();
         boolean completed = this.isCompleted.isSelected();
-        Task task = new Task(id, this.user.getUsername(), title, des, dueDate, tag, flag, completed);
+
+        DatabaseManager.checkDateConstraint(id, dueDate);
+        Task task = new Task(id, this.user.getUsername(), title, des, frequency, dueDate, tag, flag, completed);
         DatabaseManager.editTask(task);
+
         updateTaskList();
-        closeEditTaskPane();
     }
 
-    @FXML public void closeEditTaskPane() {
-        editTaskPane.setVisible(false);
-        taskList.setVisible(true);
-    }
-
-    private void loadUserTasks() {
+    @FXML public void deleteTask() {
+        int id = taskIdMap.get(Integer.parseInt(this.taskId.getText()));
+        DatabaseManager.deleteTask(id);
         updateTaskList();
-        this.taskList.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-        this.taskList.setVisible(true);
     }
 
     public void updateTaskList() {
         this.user = new User(ADMIN_USERNAME, ADMIN_PASSWORD);
+        ArrayList<String> frequencies = DatabaseManager.getFrequencies();
+        ArrayList<String> flags = DatabaseManager.getFlags();
         ArrayList<Task> tasks = this.user.getTasks();
         HashSet<Integer> ids = new HashSet<>();
+
         this.taskIdMap.clear();
         int taskId = 0;
         this.taskList.getItems().clear();
+
+        for (String frequency : frequencies) {
+            if (!this.taskToEditFrequency.getItems().contains(frequency)) {
+                this.taskToEditFrequency.getItems().add(frequency);
+            }
+        }
+        for (String flag : flags) {
+            if (!this.taskToEditFlag.getItems().contains(flag)) {
+                this.taskToEditFlag.getItems().add(flag);
+            }
+        }
         for (Task task : tasks) {
             if (!ids.contains(task.getId())) {
                 taskId += 1;
@@ -151,8 +156,11 @@ public class App extends Application {
                 this.taskList.getItems().add(task.getTitle());
             }
         }
+
         this.taskList.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         this.taskList.setVisible(true);
+        this.editTaskPane.setVisible(false);
+        this.addTaskPane.setVisible(false);
     }
 
     private void launchAppWindow() {
