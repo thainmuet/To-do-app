@@ -1,7 +1,6 @@
 import com.jfoenix.controls.JFXCheckBox;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXListView;
-import com.jfoenix.controls.JFXTreeView;
 import javafx.application.Application;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -28,6 +27,7 @@ public class App extends Application {
     private static final String APP_WINDOW = "view/fxml/App.fxml";
 
     @FXML protected JFXListView<String> taskList = new JFXListView<>();
+    @FXML protected JFXListView<String> projectList = new JFXListView<>();
     @FXML protected VBox menu;
     @FXML private Label sceneTitle;
     @FXML protected Text dueDateWarning;
@@ -51,6 +51,7 @@ public class App extends Application {
     private static int taskId = 0;
     private final AuthorizationManager auth = new AuthorizationManager();
     private final HashMap<Integer, Pair<Integer, Task>> taskMap = new HashMap<>();
+    private final HashMap<Integer, Pair<Integer, Project>> projectMap = new HashMap<>();
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     public static void main(String[] args) {
@@ -72,6 +73,7 @@ public class App extends Application {
         addProjectPane.setVisible(false);
         editTaskPane.setVisible(false);
         taskList.setVisible(false);
+        projectList.setVisible(false);
     }
 
     @FXML public void launchAddProjectPane() {
@@ -83,6 +85,7 @@ public class App extends Application {
         addTaskPane.setVisible(false);
         editTaskPane.setVisible(false);
         taskList.setVisible(false);
+        projectList.setVisible(false);
     }
 
     @FXML public void launchEditTaskPane() {
@@ -165,8 +168,12 @@ public class App extends Application {
             String addedDate = formatter.format(LocalDateTime.now());
             Project project = new Project(id, user.getUsername(), title, des, addedDate);
             user.addProject(project);
-            addProjectPane.setVisible(false);
+            updateProjectList();
         }
+    }
+
+    @FXML public void closeAddProjectPane() {
+        addProjectPane.setVisible(false);
     }
 
     public void updateTaskList() {
@@ -197,8 +204,29 @@ public class App extends Application {
 
         taskList.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         taskList.setVisible(true);
+        projectList.setVisible(false);
         editTaskPane.setVisible(false);
         addTaskPane.setVisible(false);
+    }
+
+    @FXML public void updateProjectList() {
+        HashMap<Integer, Project> projects = user.getProjects();
+        int projectIndex = 0;
+        this.projectList.getItems().clear();
+
+        for (Map.Entry<Integer, Project> entry : projects.entrySet()) {
+            Pair<Integer, Project> project = new Pair<>(entry.getKey(), entry.getValue());
+            projectMap.put(projectIndex, project);
+            this.projectList.getItems().add(entry.getValue().getTitle());
+            projectIndex += 1;
+        }
+
+        projectList.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+        projectList.setVisible(true);
+        taskList.setVisible(false);
+        editTaskPane.setVisible(false);
+        addTaskPane.setVisible(false);
+        addProjectPane.setVisible(false);
     }
 
     public void launchAppWindow(User user) {

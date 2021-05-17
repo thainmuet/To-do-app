@@ -21,7 +21,7 @@
             <Insets />
          </VBox.margin>
       </JFXButton>
-      <JFXButton onAction="#updateTaskList" prefHeight="35.0" prefWidth="300.0" stylesheets="@../css/style.css" text="Projects" />
+      <JFXButton onAction="#updateProjectList" prefHeight="35.0" prefWidth="300.0" stylesheets="@../css/style.css" text="Projects" />
    </VBox>
    <AnchorPane layoutX="545.0" layoutY="240.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="300.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="40.0">
       <Label layoutX="337.0" layoutY="74.0" text="Projects" visible="false" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="0.0">
@@ -37,6 +37,7 @@
          </font>
       </Label>
       <JFXListView fx:id="taskList" onMouseClicked="#launchEditTaskPane" style="-fx-background-color: fffff; -fx-border-color: ffffff;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="50.0" AnchorPane.topAnchor="60.0" />
+      <JFXListView fx:id="projectList" layoutX="143.0" layoutY="120.0" onMouseClicked="#launchEditTaskPane" style="-fx-background-color: fffff; -fx-border-color: ffffff;" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="50.0" AnchorPane.topAnchor="60.0" />
       <AnchorPane fx:id="editTaskPane" layoutX="131.0" layoutY="160.0" prefHeight="200.0" prefWidth="200.0" visible="false" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="50.0" AnchorPane.topAnchor="60.0">
          <Label layoutX="49.0" layoutY="27.0" text="Title:" AnchorPane.leftAnchor="40.0" AnchorPane.topAnchor="27.0">
             <font>
@@ -104,7 +105,7 @@
          <TextField fx:id="newProjectTitle" layoutX="193.0" layoutY="23.0" promptText="(required)" AnchorPane.leftAnchor="149.0" AnchorPane.rightAnchor="35.0" AnchorPane.topAnchor="24.0" />
          <TextArea fx:id="newProjectDescription" layoutX="149.0" layoutY="60.0" prefHeight="120.0" prefWidth="201.0" AnchorPane.bottomAnchor="333.0" AnchorPane.leftAnchor="149.0" AnchorPane.rightAnchor="35.0" AnchorPane.topAnchor="67.0" />
          <JFXButton layoutX="280.0" layoutY="232.0" onAction="#addProject" prefHeight="28.0" prefWidth="70.0" text="Add" />
-         <JFXButton layoutX="200.0" layoutY="232.0" onAction="#updateTaskList" prefHeight="28.0" prefWidth="70.0" text="Cancel" />
+         <JFXButton layoutX="200.0" layoutY="232.0" onAction="#closeAddProjectPane" prefHeight="28.0" prefWidth="70.0" text="Cancel" />
       </AnchorPane>
    </AnchorPane>
 </AnchorPane>
