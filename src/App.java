@@ -26,17 +26,18 @@ public class App extends Application {
 
     private static final String APP_NAME = "To-do";
     private static final String APP_WINDOW = "view/fxml/App.fxml";
-    private static final String NEW_TASK_TITLE = "New task";
 
     @FXML protected JFXListView<String> taskList = new JFXListView<>();
     @FXML protected VBox menu;
-    @FXML protected JFXTreeView<String> menuTree = new JFXTreeView<>();
     @FXML private Label sceneTitle;
     @FXML protected Text dueDateWarning;
     @FXML private AnchorPane addTaskPane;
     @FXML private AnchorPane editTaskPane;
+    @FXML protected AnchorPane addProjectPane;
     @FXML private TextField newTaskTitle;
     @FXML private TextArea newTaskDescription;
+    @FXML private TextField newProjectTitle;
+    @FXML private TextArea newProjectDescription;
     @FXML protected TextField taskToEditAddedDate;
     @FXML private DatePicker taskToEditDueDate;
     @FXML private TextField taskToEditTitle;
@@ -56,32 +57,32 @@ public class App extends Application {
         launch(args);
     }
 
-    @Override
-    public void start(Stage stage) {
+    @Override public void start(Stage stage) {
         DatabaseManager.connect();
         DatabaseManager.createDatabase();
         auth.launchSignInWindow();
     }
 
     @FXML public void launchAddTaskPane() {
-        this.sceneTitle.setText(NEW_TASK_TITLE);
-        this.addTaskPane.setVisible(true);
-        this.newTaskTitle.setText("");
-        this.newTaskDescription.setText("");
-        this.editTaskPane.setVisible(false);
-        this.taskList.setVisible(false);
+        sceneTitle.setText("New task");
+        newTaskTitle.setText("");
+        newTaskDescription.setText("");
+
+        addTaskPane.setVisible(true);
+        addProjectPane.setVisible(false);
+        editTaskPane.setVisible(false);
+        taskList.setVisible(false);
     }
 
-    @FXML public void addTask() {
-        int id = DatabaseManager.getHighestTaskId() + 1;
-        String title = newTaskTitle.getText();
-        String des = newTaskDescription.getText();
-        if (!title.equals("")) {
-            String addedDate = formatter.format(LocalDateTime.now());
-            Task task = new Task(id, user.getUsername(), title, des, addedDate);
-            user.addTask(task);
-            updateTaskList();
-        }
+    @FXML public void launchAddProjectPane() {
+        sceneTitle.setText("New project");
+        newProjectTitle.setText("");
+        newProjectDescription.setText("");
+
+        addProjectPane.setVisible(true);
+        addTaskPane.setVisible(false);
+        editTaskPane.setVisible(false);
+        taskList.setVisible(false);
     }
 
     @FXML public void launchEditTaskPane() {
@@ -105,6 +106,18 @@ public class App extends Application {
 
             taskList.setVisible(false);
             editTaskPane.setVisible(true);
+        }
+    }
+
+    @FXML public void addTask() {
+        int id = DatabaseManager.getHighestId("task") + 1;
+        String title = newTaskTitle.getText();
+        String des = newTaskDescription.getText();
+        if (!title.equals("")) {
+            String addedDate = formatter.format(LocalDateTime.now());
+            Task task = new Task(id, user.getUsername(), title, des, addedDate);
+            user.addTask(task);
+            updateTaskList();
         }
     }
 
@@ -144,6 +157,18 @@ public class App extends Application {
         updateTaskList();
     }
 
+    @FXML public void addProject() {
+        int id = DatabaseManager.getHighestId("project") + 1;
+        String title = newProjectTitle.getText();
+        String des = newProjectDescription.getText();
+        if (!title.equals("")) {
+            String addedDate = formatter.format(LocalDateTime.now());
+            Project project = new Project(id, user.getUsername(), title, des, addedDate);
+            user.addProject(project);
+            addProjectPane.setVisible(false);
+        }
+    }
+
     public void updateTaskList() {
         ArrayList<String> frequencies = DatabaseManager.getFrequencies();
         for (String frequency : frequencies) {
@@ -176,7 +201,7 @@ public class App extends Application {
         addTaskPane.setVisible(false);
     }
 
-    public static void launchAppWindow(User user) {
+    public void launchAppWindow(User user) {
         App.user = user;
         try {
             FXMLLoader appLoader= new FXMLLoader(App.class.getResource(APP_WINDOW));
@@ -190,5 +215,4 @@ public class App extends Application {
             e.printStackTrace();
         }
     }
-
 }

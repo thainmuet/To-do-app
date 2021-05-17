@@ -61,11 +61,11 @@ public class AuthorizationManager {
             this.user = new User(username, password);
             signInWarning.setVisible(false);
             signInStage.close();
-            App.launchAppWindow(this.user);
+            App app = new App();
+            app.launchAppWindow(this.user);
         } else {
             signInWarning.setVisible(true);
         }
-        System.out.println(this.user.getUsername());
     }
 
     @FXML

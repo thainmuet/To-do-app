@@ -6,7 +6,6 @@ public class Task {
     private String title;
     private String description;
     private String addedDate;
-
     private String frequency;
     private String dueDate;
     private String tag;
@@ -26,7 +25,11 @@ public class Task {
         this.completed = completed;
     }
 
-    public Task(int id, String username, String title,  String description, String addedDate) {
+    public Task(int id,
+                String username,
+                String title,
+                String description,
+                String addedDate) {
         this.title = title;
         this.description = description;
         this.username = username;

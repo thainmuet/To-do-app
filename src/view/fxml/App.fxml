@@ -4,7 +4,6 @@
 <?import com.jfoenix.controls.JFXCheckBox?>
 <?import com.jfoenix.controls.JFXComboBox?>
 <?import com.jfoenix.controls.JFXListView?>
-<?import com.jfoenix.controls.JFXTreeView?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
@@ -22,7 +21,7 @@
             <Insets />
          </VBox.margin>
       </JFXButton>
-      <JFXTreeView fx:id="menuTree" />
+      <JFXButton onAction="#updateTaskList" prefHeight="35.0" prefWidth="300.0" stylesheets="@../css/style.css" text="Projects" />
    </VBox>
    <AnchorPane layoutX="545.0" layoutY="240.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="300.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="40.0">
       <Label layoutX="337.0" layoutY="74.0" text="Projects" visible="false" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="0.0">
@@ -30,7 +29,8 @@
             <Font name="Liberation Sans Bold" size="26.0" />
          </font>
       </Label>
-      <JFXButton layoutX="381.0" layoutY="13.0" onAction="#launchAddTaskPane" style="-fx-background-color: #318bb5;" text="+ Add task" textFill="WHITE" AnchorPane.topAnchor="13.0" />
+      <JFXButton layoutX="400.0" layoutY="13.0" onAction="#launchAddTaskPane" prefWidth="70.0" style="-fx-background-color: #318bb5;" text="+ Task" textFill="WHITE" />
+      <JFXButton layoutX="313.0" layoutY="13.0" onAction="#launchAddProjectPane" style="-fx-background-color: #318bb5;" text="+ Project" textFill="WHITE" />
       <Label fx:id="sceneTitle" layoutX="36.0" layoutY="-1.0" text="Tasks" AnchorPane.leftAnchor="50.0" AnchorPane.topAnchor="10.0">
          <font>
             <Font name="Liberation Sans Bold" size="26.0" />
@@ -98,6 +98,13 @@
          <JFXButton layoutX="280.0" layoutY="232.0" onAction="#addTask" prefHeight="28.0" prefWidth="70.0" text="Add" />
          <JFXButton layoutX="200.0" layoutY="232.0" onAction="#updateTaskList" prefHeight="28.0" prefWidth="70.0" text="Cancel" />
       </AnchorPane>
-      <Label fx:id="taskId" text="TaskID" visible="false" />
+      <AnchorPane fx:id="addProjectPane" layoutX="68.0" layoutY="86.0" prefHeight="200.0" prefWidth="200.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="50.0" AnchorPane.topAnchor="60.0">
+         <Label text="Title:" AnchorPane.leftAnchor="40.0" AnchorPane.topAnchor="27.0" />
+         <Label layoutX="40.0" layoutY="108.0" text="Description:" AnchorPane.leftAnchor="40.0" AnchorPane.topAnchor="67.0" />
+         <TextField fx:id="newProjectTitle" layoutX="193.0" layoutY="23.0" promptText="(required)" AnchorPane.leftAnchor="149.0" AnchorPane.rightAnchor="35.0" AnchorPane.topAnchor="24.0" />
+         <TextArea fx:id="newProjectDescription" layoutX="149.0" layoutY="60.0" prefHeight="120.0" prefWidth="201.0" AnchorPane.bottomAnchor="333.0" AnchorPane.leftAnchor="149.0" AnchorPane.rightAnchor="35.0" AnchorPane.topAnchor="67.0" />
+         <JFXButton layoutX="280.0" layoutY="232.0" onAction="#addProject" prefHeight="28.0" prefWidth="70.0" text="Add" />
+         <JFXButton layoutX="200.0" layoutY="232.0" onAction="#updateTaskList" prefHeight="28.0" prefWidth="70.0" text="Cancel" />
+      </AnchorPane>
    </AnchorPane>
 </AnchorPane>

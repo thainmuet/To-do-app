@@ -42,110 +42,6 @@ public class DatabaseManager {
         }
     }
 
-    public static HashMap<String, String> getUsers() {
-        HashMap<String, String> users = new HashMap<>();
-        try {
-            statement = connection.createStatement();
-            String query = String.format("SELECT username, password FROM %s;", "user");
-            ResultSet rs = statement.executeQuery(query);
-            while(rs.next()) {
-                users.put(rs.getString("username"), rs.getString("password"));
-            }
-        } catch (SQLException e) {
-            printExceptionLog(e);
-        }
-        return users;
-    }
-
-    public static HashMap<Integer, Task> getTasks(String username) {
-        HashMap<Integer, Task> tasks = new HashMap<>();
-        try {
-            statement  = connection.createStatement();
-            String query = String.format("SELECT * FROM %s WHERE username='%s';", "task", username);
-            resultSet = statement.executeQuery(query);
-            while(resultSet.next()) {
-                Task task = new Task(resultSet.getInt("task_id"),
-                        resultSet.getString("username"),
-                        resultSet.getString("title"),
-                        resultSet.getString("description"),
-                        resultSet.getString("added_date"),
-                        resultSet.getString("frequency"),
-                        resultSet.getString("due_date"),
-                        resultSet.getString("tag"),
-                        resultSet.getString("flag"),
-                        resultSet.getBoolean("completed"));
-                tasks.put(task.getId(), task);
-            }
-        } catch (SQLException e) {
-            printExceptionLog(e);
-        }
-        return tasks;
-    }
-
-    public static ArrayList<String> getFlags() {
-        ArrayList<String> flags = new ArrayList<>();
-        try {
-            statement  = connection.createStatement();
-            String query = String.format("SELECT flag FROM %s", "importance");
-            resultSet = statement.executeQuery(query);
-            while(resultSet.next()) {
-                flags.add(resultSet.getString("flag"));
-            }
-        } catch (SQLException e) {
-            printExceptionLog(e);
-        }
-        return flags;
-    }
-
-    public static ArrayList<String> getFrequencies() {
-        ArrayList<String> frequencies = new ArrayList<>();
-        try {
-            statement  = connection.createStatement();
-            String query = String.format("SELECT frequency FROM %s", "frequency");
-            resultSet = statement.executeQuery(query);
-            while(resultSet.next()) {
-                frequencies.add(resultSet.getString("frequency"));
-            }
-        } catch (SQLException e) {
-            printExceptionLog(e);
-        }
-        return frequencies;
-    }
-
-    public static int getFlagPoint(String flag) {
-        String query = String.format("SELECT point FROM importance WHERE flag='%s'", flag);
-        int point = 0;
-        try {
-            statement = connection.createStatement();
-            point = statement.executeUpdate(query);
-        } catch (SQLException e) {
-            printExceptionLog(e);
-        }
-        return point;
-    }
-
-    public static boolean authorize(String username, String password) {
-        HashMap<String, String> userList = getUsers();
-        if (userList.containsKey(username)) {
-            return userList.get(username).equals(password);
-        }
-        return false;
-    }
-
-    public static boolean createAccount(String username, String password) {
-        try {
-            if (getUsers().containsKey(username)) {
-                return false;
-            }
-            statement = connection.createStatement();
-            String query = String.format("INSERT INTO %s (username, password) VALUES ('%s', '%s')", "user", username, password);
-            statement.executeUpdate(query);
-        } catch (SQLException e) {
-            printExceptionLog(e);
-        }
-        return true;
-    }
-
     public static void addNewTask(Task task, String username) {
         try {
             statement = connection.createStatement();
@@ -193,6 +89,55 @@ public class DatabaseManager {
         }
     }
 
+    public static void addNewProject(Project project, String username) {
+        try {
+            statement = connection.createStatement();
+            String title = project.getTitle();
+            String des = project.getDescription();
+            String addedDate = project.getAddedDate();
+            String format = "INSERT INTO project (username, title, description, added_date) VALUES ('%s', '%s', '%s', '%s')";
+            String query = String.format(format, username, title, des, addedDate);
+            statement.executeUpdate(query);
+        } catch (SQLException e) {
+            printExceptionLog(e);
+        }
+
+    }
+
+    public static boolean authorize(String username, String password) {
+        HashMap<String, String> userList = getUsers();
+        if (userList.containsKey(username)) {
+            return userList.get(username).equals(password);
+        }
+        return false;
+    }
+
+    public static boolean createAccount(String username, String password) {
+        try {
+            if (getUsers().containsKey(username)) {
+                return false;
+            }
+            statement = connection.createStatement();
+            String query = String.format("INSERT INTO %s (username, password) VALUES ('%s', '%s')", "user", username, password);
+            statement.executeUpdate(query);
+        } catch (SQLException e) {
+            printExceptionLog(e);
+        }
+        return true;
+    }
+
+    public static int getFlagPoint(String flag) {
+        String query = String.format("SELECT point FROM importance WHERE flag='%s'", flag);
+        int point = 0;
+        try {
+            statement = connection.createStatement();
+            point = statement.executeUpdate(query);
+        } catch (SQLException e) {
+            printExceptionLog(e);
+        }
+        return point;
+    }
+
     public static int getDateDif(int taskId, String dueDate) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String query = String.format("SELECT added_date FROM task WHERE task_id=%d", taskId);
@@ -217,14 +162,15 @@ public class DatabaseManager {
         return dueLocalDate.compareTo(addedLocalDate);
     }
 
-    public static int getHighestTaskId() {
-        String query = String.format("SELECT MAX(task_id) FROM %s", "task");
+    public static int getHighestId(String table) {
+        String queryColumn = table.equals("task") ? "MAX(task_id)" : "MAX(project_id)";
+        String query = String.format("SELECT %s FROM %s", queryColumn, table);
         int id = 0;
         try {
             statement = connection.createStatement();
             resultSet = statement.executeQuery(query);
             while (resultSet.next()) {
-                id = resultSet.getInt("MAX(task_id)");
+                id = resultSet.getInt(queryColumn);
             }
         } catch (SQLException e) {
             printExceptionLog(e);
@@ -233,11 +179,98 @@ public class DatabaseManager {
         return id;
     }
 
-    public static void close() {
+    public static HashMap<String, String> getUsers() {
+        HashMap<String, String> users = new HashMap<>();
         try {
-            connection.close();
-        } catch (SQLException throwable) {
-            throwable.printStackTrace();
+            statement = connection.createStatement();
+            String query = String.format("SELECT username, password FROM %s;", "user");
+            ResultSet rs = statement.executeQuery(query);
+            while(rs.next()) {
+                users.put(rs.getString("username"), rs.getString("password"));
+            }
+        } catch (SQLException e) {
+            printExceptionLog(e);
         }
+        return users;
     }
+
+    public static HashMap<Integer, Task> getTasks(String username) {
+        HashMap<Integer, Task> tasks = new HashMap<>();
+        try {
+            statement  = connection.createStatement();
+            String query = String.format("SELECT * FROM %s WHERE username='%s';", "task", username);
+            resultSet = statement.executeQuery(query);
+            while(resultSet.next()) {
+                Task task = new Task(resultSet.getInt("task_id"),
+                        resultSet.getString("username"),
+                        resultSet.getString("title"),
+                        resultSet.getString("description"),
+                        resultSet.getString("added_date"),
+                        resultSet.getString("frequency"),
+                        resultSet.getString("due_date"),
+                        resultSet.getString("tag"),
+                        resultSet.getString("flag"),
+                        resultSet.getBoolean("completed"));
+                tasks.put(task.getId(), task);
+            }
+        } catch (SQLException e) {
+            printExceptionLog(e);
+        }
+        return tasks;
+    }
+
+    public static HashMap<Integer,Project> getProjects(String username) {
+        HashMap<Integer, Project> projects = new HashMap<>();
+        try {
+            statement  = connection.createStatement();
+            String query = String.format("SELECT * FROM project WHERE username='%s'", username);
+            resultSet = statement.executeQuery(query);
+            while(resultSet.next()) {
+                Project project = new Project(resultSet.getInt("project_id"),
+                        resultSet.getString("username"),
+                        resultSet.getString("title"),
+                        resultSet.getString("description"),
+                        resultSet.getString("added_date"),
+                        resultSet.getString("due_date"),
+                        resultSet.getString("tag"),
+                        resultSet.getString("flag"),
+                        resultSet.getBoolean("completed"));
+                projects.put(project.getId(), project);
+            }
+        } catch (SQLException e) {
+            printExceptionLog(e);
+        }
+        return projects;
+    }
+
+    public static ArrayList<String> getFlags() {
+        ArrayList<String> flags = new ArrayList<>();
+        try {
+            statement  = connection.createStatement();
+            String query = String.format("SELECT flag FROM %s", "importance");
+            resultSet = statement.executeQuery(query);
+            while(resultSet.next()) {
+                flags.add(resultSet.getString("flag"));
+            }
+        } catch (SQLException e) {
+            printExceptionLog(e);
+        }
+        return flags;
+    }
+
+    public static ArrayList<String> getFrequencies() {
+        ArrayList<String> frequencies = new ArrayList<>();
+        try {
+            statement  = connection.createStatement();
+            String query = String.format("SELECT frequency FROM %s", "frequency");
+            resultSet = statement.executeQuery(query);
+            while(resultSet.next()) {
+                frequencies.add(resultSet.getString("frequency"));
+            }
+        } catch (SQLException e) {
+            printExceptionLog(e);
+        }
+        return frequencies;
+    }
+
 }

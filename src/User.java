@@ -6,7 +6,7 @@ public class User {
     private String username;
     private String password;
     private HashMap<Integer, Task> tasks;
-    private ArrayList<Project> projects;
+    private HashMap<Integer, Project> projects;
 
     public User() {}
 
@@ -15,7 +15,8 @@ public class User {
         this.password = password;
         this.tasks = new HashMap<>();
         tasks = DatabaseManager.getTasks(username);
-        this.projects = new ArrayList<>();
+        this.projects = new HashMap<>();
+        projects = DatabaseManager.getProjects(username);
     }
 
     public String getUsername() {
@@ -41,8 +42,12 @@ public class User {
 
     public void addTask(Task task) {
         this.tasks.put(task.getId(), task);
-        System.out.println("44: " + tasks.size());
-        DatabaseManager.addNewTask(task, this.username);
+        DatabaseManager.addNewTask(task, username);
+    }
+
+    public void addProject(Project project) {
+        this.projects.put(project.getId(), project);
+        DatabaseManager.addNewProject(project, username);
     }
 
     public void deleteTask(int taskId) {
@@ -52,5 +57,9 @@ public class User {
 
     public HashMap<Integer, Task> getTasks() {
         return DatabaseManager.getTasks(this.username);
+    }
+
+    public HashMap<Integer, Project> getProjects() {
+        return DatabaseManager.getProjects(this.username);
     }
 }
