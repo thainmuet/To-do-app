@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS project (
     added_date DATE,
     tag VARCHAR(255),
     completed TINYINT(1) DEFAULT FALSE,
-    flag CHAR(50),
+    flag CHAR(50) DEFAULT 'None',
     PRIMARY KEY (project_id, username),
     FOREIGN KEY (username)
         REFERENCES user (username),

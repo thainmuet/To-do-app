@@ -80,6 +80,27 @@ public class DatabaseManager {
         }
     }
 
+    public static void editProject(Project project) {
+        int id = project.getId();
+        String title = project.getTitle();
+        String des = project.getDescription();
+        String addedDate = project.getAddedDate();
+        String dueDate = project.getDueDate();
+        String tag = project.getTag();
+        String flag = project.getFlag();
+        boolean completed = project.getCompleted();
+
+        String format = "UPDATE project SET title='%s', description='%s', added_date='%s', due_date='%s', tag='%s', flag='%s', completed=%b WHERE project_id=%d";
+        String query = String.format(format, title, des, addedDate, dueDate, tag, flag, completed, id);
+        System.out.println(query);
+        try {
+            statement = connection.createStatement();
+            statement.executeUpdate(query);
+        } catch (SQLException e) {
+            printExceptionLog(e);
+        }
+    }
+
     public static void deleteTask(int taskId) {
         String query = String.format("DELETE FROM task WHERE task_id=%d", taskId);
         try {
@@ -139,9 +160,10 @@ public class DatabaseManager {
         return point;
     }
 
-    public static int getDateDif(int taskId, String dueDate) {
+    public static int getDateDif(int id, String dueDate, String table) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        String query = String.format("SELECT added_date FROM task WHERE task_id=%d", taskId);
+        String queryColumn = table.equals("task") ? "task_id" : "project_id";
+        String query = String.format("SELECT added_date FROM %s WHERE %s=%d", table, queryColumn, id);
         String addedDate = null;
 
         System.out.println(query);

@@ -1,3 +1,4 @@
+import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXCheckBox;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXListView;
@@ -33,8 +34,10 @@ public class App extends Application {
     @FXML protected VBox menu;
     @FXML private Label sceneTitle;
     @FXML protected Text dueDateWarning;
+    @FXML protected Text dueDateProjectWarning;
     @FXML private AnchorPane addTaskPane;
     @FXML private AnchorPane editTaskPane;
+    @FXML private AnchorPane editProjectPane;
     @FXML protected AnchorPane addProjectPane;
     @FXML private TextField newTaskTitle;
     @FXML private TextArea newTaskDescription;
@@ -45,13 +48,22 @@ public class App extends Application {
     @FXML private TextField taskToEditTitle;
     @FXML private TextArea taskToEditDescription;
     @FXML private TextField taskToEditTag;
+    @FXML protected TextField projectToEditAddedDate;
+    @FXML private DatePicker projectToEditDueDate;
+    @FXML private TextField projectToEditTitle;
+    @FXML private TextArea projectToEditDescription;
+    @FXML private TextField projectToEditTag;
+    @FXML private JFXComboBox<String> projectToEditFlag;
     @FXML private JFXComboBox<String> taskToEditFlag;
     @FXML private JFXComboBox<String> taskToEditFrequency;
     @FXML private JFXComboBox<Integer> taskToEditProjectID;
-    @FXML private JFXCheckBox isCompleted;
+    @FXML private JFXCheckBox isCompletedTask;
+    @FXML private JFXCheckBox isCompletedProject;
+    @FXML private JFXButton editProjectButton;
 
     private static User user = null;
     private static int taskId = 0;
+    private static int projectId = 0;
     private final AuthorizationManager auth = new AuthorizationManager();
     private final HashMap<Integer, Pair<Integer, Task>> taskMap = new HashMap<>();
     private final HashMap<Integer, Pair<Integer, Project>> projectMap = new HashMap<>();
@@ -78,6 +90,8 @@ public class App extends Application {
                 false,
                 true,
                 false,
+                false,
+                false,
                 false);
     }
 
@@ -91,20 +105,28 @@ public class App extends Application {
                 false,
                 false,
                 true,
+                false,
+                false,
                 false);
     }
 
     @FXML public void launchEditTaskPane() {
         JFXListView<String> list = new JFXListView<>();
-        int taskIndex = -1;
-        if (taskList.isVisible()) {
+        boolean check = false;
+        int taskIndex;
+        int taskId = -1;
+        if (taskList.isVisible() && !taskList.getItems().isEmpty()) {
             list.getItems().addAll(taskList.getItems());
             taskIndex = taskList.getSelectionModel().getSelectedIndex();
-        } else if (projectTaskList.isVisible()) {
-            list = projectTaskList;
+            taskId = taskMap.get(taskIndex).getKey();
+            check = true;
+        } else if (projectTaskList.isVisible() && !projectTaskList.getItems().isEmpty()) {
+            list.getItems().addAll(projectTaskList.getItems());
+            taskIndex = projectTaskList.getSelectionModel().getSelectedIndex();
+            taskId = projectTaskMap.get(taskIndex).getKey();
+            check = true;
         }
-        if (!list.getItems().isEmpty()) {
-            int taskId = taskMap.get(taskIndex).getKey();
+        if (check) {
             App.taskId = taskId;
 
             HashMap<Integer, Task> tasks = user.getTasks();
@@ -119,17 +141,52 @@ public class App extends Application {
             this.taskToEditFrequency.setValue(task.getFrequency());
             this.taskToEditFlag.setValue(task.getFlag());
             this.taskToEditProjectID.setValue(task.getProject_id());
+            this.taskToEditProjectTitle.setText(DatabaseManager.getProjectTitle(taskToEditProjectID.getValue()));
             this.taskToEditProjectID.setOnAction(e -> this.taskToEditProjectTitle.setText(DatabaseManager.getProjectTitle(taskToEditProjectID.getValue())));
-            this.isCompleted.setSelected(task.getCompleted());
+            this.isCompletedTask.setSelected(task.getCompleted());
 
             setPaneVisible(false,
                     false,
                     false,
                     false,
                     false,
-                    true);
+                    true,
+                    false,
+                    false);
         } else {
             System.out.println(4);
+        }
+    }
+
+    @FXML public void launchEditProjectPane() {
+        JFXListView<String> list = new JFXListView<>();
+        list.getItems().addAll(projectTaskList.getItems());
+
+        if (!projectList.getItems().isEmpty()) {
+            int projectIndex = projectList.getSelectionModel().getSelectedIndex();
+            int projectId = projectMap.get(projectIndex).getKey();
+            App.projectId = projectId;
+
+            HashMap<Integer, Project> projects = user.getProjects();
+            Project project = projects.get(projectId);
+
+            this.projectToEditTitle.setText(project.getTitle());
+            this.projectToEditDescription.setText(project.getDescription() == null ? "" : project.getDescription());
+            this.projectToEditAddedDate.setText(project.getAddedDate());
+            String dueDate = project.getDueDate();
+            this.projectToEditDueDate.setValue(dueDate != null ? LocalDate.parse(dueDate, formatter) : LocalDate.parse(LocalDateTime.now().format(formatter)));
+            this.projectToEditTag.setText(project.getTag() == null ? "" : project.getTag());
+            this.projectToEditFlag.setValue(project.getFlag());
+            this.isCompletedProject.setSelected(project.getCompleted());
+
+            setPaneVisible(false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    true,
+                    true);
         }
     }
 
@@ -156,9 +213,9 @@ public class App extends Application {
         String tag = this.taskToEditTag.getText();
         String flag = this.taskToEditFlag.getValue();
 
-        boolean completed = this.isCompleted.isSelected();
+        boolean completed = this.isCompletedTask.isSelected();
 
-        if (DatabaseManager.getDateDif(id, dueDate) < 0) {
+        if (DatabaseManager.getDateDif(id, dueDate, "task") < 0) {
             this.dueDateWarning.setVisible(true);
         } else {
             this.dueDateWarning.setVisible(false);
@@ -175,6 +232,36 @@ public class App extends Application {
 
             DatabaseManager.editTask(task);
             updateTaskList();
+        }
+    }
+
+    @FXML public void editProject() {
+        int id = App.projectId;
+        String title = this.projectToEditTitle.getText();
+        String des = this.projectToEditDescription.getText();
+        String addedDate = this.projectToEditAddedDate.getText();
+        String dueDate = (this.projectToEditDueDate.getValue()).format(formatter);
+        String tag = this.projectToEditTag.getText();
+        String flag = this.projectToEditFlag.getValue();
+        boolean completed = this.isCompletedProject.isSelected();
+
+        if (DatabaseManager.getDateDif(id, dueDate, "project") < 0) {
+            this.dueDateProjectWarning.setVisible(true);
+        } else {
+            this.dueDateProjectWarning.setVisible(false);
+
+            Project project = new Project(id, App.user.getUsername(), title, des, addedDate, dueDate, tag, flag, completed);
+            Project projectToEdit = user.getProjects().get(id);
+            projectToEdit.setId(projectId);
+            projectToEdit.setTitle(title);
+            projectToEdit.setDescription(des);
+            projectToEdit.setDueDate(dueDate);
+            projectToEdit.setTag(tag);
+            projectToEdit.setFlag(flag);
+            projectToEdit.setCompleted(completed);
+
+            DatabaseManager.editProject(project);
+            updateProjectList();
         }
     }
 
@@ -215,6 +302,8 @@ public class App extends Application {
         projectList.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         setPaneVisible(false,
                 true,
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -260,10 +349,18 @@ public class App extends Application {
                 false,
                 false,
                 false ,
+                false,
+                false,
                 false);
     }
 
     @FXML  public void updateProjectTaskList() {
+        ArrayList<String> flags = DatabaseManager.getFlags();
+        for (String flag : flags) {
+            if (!this.projectToEditFlag.getItems().contains(flag)) {
+                this.projectToEditFlag.getItems().add(flag);
+            }
+        }
         if (!projectList.getItems().isEmpty()) {
             this.projectTaskList.getItems().clear();
 
@@ -280,12 +377,15 @@ public class App extends Application {
             }
 
             projectTaskList.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+            this.editProjectButton.setVisible(true);
             setPaneVisible(false,
                     false,
                     true,
                     false,
                     false,
-                    false);
+                    false,
+                    false,
+                    true);
         }
     }
 
@@ -294,7 +394,9 @@ public class App extends Application {
                                boolean projectTaskListVisible,
                                boolean addTaskPaneVisible,
                                boolean addProjectPaneVisible,
-                               boolean editTaskPaneVisible) {
+                               boolean editTaskPaneVisible,
+                               boolean editProjectPaneVisible,
+                               boolean editProjectButtonVisible) {
         taskList.setVisible(taskListVisible);
         projectList.setVisible(projectListVisible);
         projectTaskList.setVisible(projectTaskListVisible);
@@ -302,6 +404,9 @@ public class App extends Application {
         addProjectPane.setVisible(addProjectPaneVisible);
         addTaskPane.setVisible(addTaskPaneVisible);
         editTaskPane.setVisible(editTaskPaneVisible);
+        editProjectPane.setVisible(editProjectPaneVisible);
+
+        editProjectButton.setVisible(editProjectButtonVisible);
     }
 
     public void launchAppWindow(User user) {
