@@ -1,7 +1,6 @@
-import java.time.format.DateTimeFormatter;
-
 public class Task {
     private int id;
+    private int project_id;
     private String username;
     private String title;
     private String description;
@@ -12,7 +11,15 @@ public class Task {
     private String flag;
     private Boolean completed = false;
 
-    public Task(int id, String username, String title, String description, String frequency, String dueDate, String tag, String flag, Boolean completed) {
+    public Task(int id,
+                String username,
+                String title,
+                String description,
+                String frequency,
+                String dueDate,
+                String tag,
+                String flag,
+                Boolean completed) {
         this.id = id;
         this.username = username;
         this.title = title;
@@ -36,7 +43,16 @@ public class Task {
         this.addedDate = addedDate;
     }
 
-    public Task(int id, String username, String title, String description, String addedDate, String frequency, String dueDate, String tag, String flag, Boolean completed) {
+    public Task(int id,
+                String username,
+                String title,
+                String description,
+                String addedDate,
+                String frequency,
+                String dueDate,
+                String tag,
+                String flag,
+                Boolean completed) {
         this.id = id;
         this.username = username;
         this.title = title;
@@ -137,6 +153,34 @@ public class Task {
     }
 
     public void setCompleted(Boolean completed) {
+        this.completed = completed;
+    }
+
+    public int getProject_id() {
+        return project_id;
+    }
+
+    public Task(int id,
+                int project_id,
+                String username,
+                String title,
+                String description,
+                String addedDate,
+                String frequency,
+                String dueDate,
+                String tag,
+                String flag,
+                Boolean completed) {
+        this.id = id;
+        this.project_id = project_id;
+        this.username = username;
+        this.title = title;
+        this.description = description;
+        this.addedDate = addedDate;
+        this.frequency = frequency;
+        this.dueDate = dueDate;
+        this.tag = tag;
+        this.flag = flag;
         this.completed = completed;
     }
 }

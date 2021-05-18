@@ -16,45 +16,9 @@ CREATE TABLE IF NOT EXISTS importance (
     PRIMARY KEY (flag)
 );
 
-INSERT INTO importance(flag, grade)
-    VALUES
-        ('None', 1 ),
-        ('No worry', 2),
-        ('Normal', 3),
-        ('Importance', 4),
-        ('Very importance', 5);
-
 CREATE TABLE IF NOT EXISTS frequency (
     frequency CHAR(20) NOT NULL,
     PRIMARY KEY (frequency)
-);
-
-INSERT INTO frequency(frequency)
-    VALUES
-        ('None'),
-        ('Daily'),
-        ('Weekly'),
-        ('Monthly');
-
-
-CREATE TABLE IF NOT EXISTS task (
-    task_id INT AUTO_INCREMENT NOT NULL,
-    username CHAR(16) NOT NULL,
-    title VARCHAR(255) NOT NULL,
-    description TEXT,
-    due_date DATE,
-    added_date DATE,
-    frequency CHAR(20) DEFAULT 'None',
-    tag VARCHAR(255),
-    completed TINYINT(1) DEFAULT FALSE,
-    flag CHAR(50) DEFAULT 'None',
-    PRIMARY KEY (task_id, username),
-    FOREIGN KEY (username)
-        REFERENCES user (username),
-    FOREIGN KEY (frequency)
-        REFERENCES frequency (frequency),
-    FOREIGN KEY (flag) 
-        REFERENCES importance (flag)
 );
 
 CREATE TABLE IF NOT EXISTS project (
@@ -74,12 +38,45 @@ CREATE TABLE IF NOT EXISTS project (
         REFERENCES importance (flag)
 );
 
--- Get the total task grade of an user
--- SELECT SUM(grade) FROM (
---     SELECT grade FROM importance
---         WHERE flag IN (SELECT flag FROM task
---             WHERE completed = TRUE)
--- );
+
+CREATE TABLE IF NOT EXISTS task (
+    task_id INT AUTO_INCREMENT NOT NULL,
+    project_id INT,
+    username CHAR(16) NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    due_date DATE,
+    added_date DATE,
+    frequency CHAR(20) DEFAULT 'None',
+    tag VARCHAR(255),
+    completed TINYINT(1) DEFAULT FALSE,
+    flag CHAR(50) DEFAULT 'None',
+    PRIMARY KEY (task_id, username),
+    FOREIGN KEY (project_id)
+        REFERENCES project (project_id),
+    FOREIGN KEY (username)
+        REFERENCES user (username),
+    FOREIGN KEY (frequency)
+        REFERENCES frequency (frequency),
+    FOREIGN KEY (flag) 
+        REFERENCES importance (flag)
+);
+
+
+INSERT INTO frequency(frequency)
+    VALUES
+        ('None'),
+        ('Daily'),
+        ('Weekly'),
+        ('Monthly');
+
+INSERT INTO importance(flag, grade)
+    VALUES
+        ('None', 1 ),
+        ('No worry', 2),
+        ('Normal', 3),
+        ('Importance', 4),
+        ('Very importance', 5);
 
 
 -- Create new user
@@ -96,9 +93,3 @@ INSERT INTO task (username, title)
         ('root', 'Complete Cloud computing course'),
         ('admin', 'Complete discrete math'),
         ('admin', 'Complete 2 hackerRank problems');
-
-
--- Get user tasks
-SELECT * FROM task WHERE username = 'root';
-
-SELECT * FROM task WHERE username = 'admin';

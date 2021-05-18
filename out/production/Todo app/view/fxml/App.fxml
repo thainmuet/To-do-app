@@ -36,8 +36,9 @@
             <Font name="Liberation Sans Bold" size="26.0" />
          </font>
       </Label>
-      <JFXListView fx:id="taskList" onMouseClicked="#launchEditTaskPane" style="-fx-background-color: fffff; -fx-border-color: ffffff;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="50.0" AnchorPane.topAnchor="60.0" />
-      <JFXListView fx:id="projectList" layoutX="143.0" layoutY="120.0" onMouseClicked="#launchEditTaskPane" style="-fx-background-color: fffff; -fx-border-color: ffffff;" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="50.0" AnchorPane.topAnchor="60.0" />
+      <JFXListView fx:id="taskList" onMouseClicked="#launchEditTaskPane" style="-fx-background-color: fffff; -fx-border-color: ffffff;" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="50.0" AnchorPane.topAnchor="60.0" />
+      <JFXListView fx:id="projectList" layoutX="143.0" layoutY="120.0" onMouseClicked="#updateProjectTaskList" style="-fx-background-color: fffff; -fx-border-color: ffffff;" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="50.0" AnchorPane.topAnchor="60.0" />
+      <JFXListView fx:id="projectTaskList" layoutX="143.0" layoutY="105.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="50.0" AnchorPane.topAnchor="60.0" />
       <AnchorPane fx:id="editTaskPane" layoutX="131.0" layoutY="160.0" prefHeight="200.0" prefWidth="200.0" visible="false" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="50.0" AnchorPane.topAnchor="60.0">
          <Label layoutX="49.0" layoutY="27.0" text="Title:" AnchorPane.leftAnchor="40.0" AnchorPane.topAnchor="27.0">
             <font>

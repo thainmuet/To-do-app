@@ -219,6 +219,32 @@ public class DatabaseManager {
         return tasks;
     }
 
+    public static HashMap<Integer, Task> getProjectTasks(String username, int projectId) {
+        HashMap<Integer, Task> tasks = new HashMap<>();
+        try {
+            statement  = connection.createStatement();
+            String query = String.format("SELECT * FROM task WHERE username='%s' AND project_id=%d;", username, projectId);
+            resultSet = statement.executeQuery(query);
+            while(resultSet.next()) {
+                Task task = new Task(resultSet.getInt("task_id"),
+                        resultSet.getInt("project_id"),
+                        resultSet.getString("username"),
+                        resultSet.getString("title"),
+                        resultSet.getString("description"),
+                        resultSet.getString("added_date"),
+                        resultSet.getString("frequency"),
+                        resultSet.getString("due_date"),
+                        resultSet.getString("tag"),
+                        resultSet.getString("flag"),
+                        resultSet.getBoolean("completed"));
+                tasks.put(task.getId(), task);
+            }
+        } catch (SQLException e) {
+            printExceptionLog(e);
+        }
+        return tasks;
+    }
+
     public static HashMap<Integer,Project> getProjects(String username) {
         HashMap<Integer, Project> projects = new HashMap<>();
         try {

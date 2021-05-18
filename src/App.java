@@ -28,6 +28,7 @@ public class App extends Application {
 
     @FXML protected JFXListView<String> taskList = new JFXListView<>();
     @FXML protected JFXListView<String> projectList = new JFXListView<>();
+    @FXML protected JFXListView<String> projectTaskList = new JFXListView<>();
     @FXML protected VBox menu;
     @FXML private Label sceneTitle;
     @FXML protected Text dueDateWarning;
@@ -52,6 +53,7 @@ public class App extends Application {
     private final AuthorizationManager auth = new AuthorizationManager();
     private final HashMap<Integer, Pair<Integer, Task>> taskMap = new HashMap<>();
     private final HashMap<Integer, Pair<Integer, Project>> projectMap = new HashMap<>();
+    private final HashMap<Integer, Pair<Integer, Task>> projectTaskMap = new HashMap<>();
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     public static void main(String[] args) {
@@ -69,11 +71,12 @@ public class App extends Application {
         newTaskTitle.setText("");
         newTaskDescription.setText("");
 
-        addTaskPane.setVisible(true);
-        addProjectPane.setVisible(false);
-        editTaskPane.setVisible(false);
-        taskList.setVisible(false);
-        projectList.setVisible(false);
+        setPaneVisible(false,
+                false,
+                false,
+                true,
+                false,
+                false);
     }
 
     @FXML public void launchAddProjectPane() {
@@ -81,17 +84,17 @@ public class App extends Application {
         newProjectTitle.setText("");
         newProjectDescription.setText("");
 
-        addProjectPane.setVisible(true);
-        addTaskPane.setVisible(false);
-        editTaskPane.setVisible(false);
-        taskList.setVisible(false);
-        projectList.setVisible(false);
+        setPaneVisible(false,
+                false,
+                false,
+                false,
+                true,
+                false);
     }
 
     @FXML public void launchEditTaskPane() {
         if (!taskList.getItems().isEmpty()) {
             int taskIndex = taskList.getSelectionModel().getSelectedIndex();
-
             int taskId = taskMap.get(taskIndex).getKey();
             HashMap<Integer, Task> tasks = user.getTasks();
             Task task = tasks.get(taskId);
@@ -203,11 +206,56 @@ public class App extends Application {
         }
 
         taskList.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-        taskList.setVisible(true);
-        projectList.setVisible(false);
-        editTaskPane.setVisible(false);
-        addTaskPane.setVisible(false);
+        setPaneVisible(true,
+                false,
+                false,
+                false,
+                false ,
+                false);
     }
+
+    public void updateProjectTaskList() {
+        if (!projectList.getItems().isEmpty()) {
+            this.projectTaskList.getItems().clear();
+
+            int projectIndex = projectList.getSelectionModel().getSelectedIndex();
+            int projectId = projectMap.get(projectIndex).getKey();
+            HashMap<Integer, Task> tasks = DatabaseManager.getProjectTasks(App.user.getUsername(), projectId);
+            int taskIndex = 0;
+
+            for (Map.Entry<Integer, Task> entry : tasks.entrySet()) {
+                Pair<Integer, Task> task = new Pair<>(entry.getKey(), entry.getValue());
+                projectTaskMap.put(taskIndex, task);
+                this.projectTaskList.getItems().add(entry.getValue().getTitle());
+                taskIndex += 1;
+            }
+
+            projectTaskList.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+            setPaneVisible(false,
+                    false,
+                    true,
+                    false,
+                    false,
+                    false);
+        }
+    }
+
+
+    public void setPaneVisible(boolean taskListVisible,
+                               boolean projectListVisible,
+                               boolean projectTaskListVisible,
+                               boolean addTaskPaneVisible,
+                               boolean addProjectPaneVisible,
+                               boolean editTaskPaneVisible) {
+        taskList.setVisible(taskListVisible);
+        projectList.setVisible(projectListVisible);
+        projectTaskList.setVisible(projectTaskListVisible);
+
+        addProjectPane.setVisible(addProjectPaneVisible);
+        addTaskPane.setVisible(addTaskPaneVisible);
+        editTaskPane.setVisible(editTaskPaneVisible);
+    }
+
 
     @FXML public void updateProjectList() {
         HashMap<Integer, Project> projects = user.getProjects();
@@ -222,11 +270,12 @@ public class App extends Application {
         }
 
         projectList.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-        projectList.setVisible(true);
-        taskList.setVisible(false);
-        editTaskPane.setVisible(false);
-        addTaskPane.setVisible(false);
-        addProjectPane.setVisible(false);
+        setPaneVisible(false,
+                true,
+                false,
+                 false,
+                false,
+                false);
     }
 
     public void launchAppWindow(User user) {
