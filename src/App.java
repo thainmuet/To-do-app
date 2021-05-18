@@ -26,6 +26,7 @@ public class App extends Application {
     private static final String APP_NAME = "To-do";
     private static final String APP_WINDOW = "view/fxml/App.fxml";
 
+    @FXML protected TextField taskToEditProjectTitle;
     @FXML protected JFXListView<String> taskList = new JFXListView<>();
     @FXML protected JFXListView<String> projectList = new JFXListView<>();
     @FXML protected JFXListView<String> projectTaskList = new JFXListView<>();
@@ -46,6 +47,7 @@ public class App extends Application {
     @FXML private TextField taskToEditTag;
     @FXML private JFXComboBox<String> taskToEditFlag;
     @FXML private JFXComboBox<String> taskToEditFrequency;
+    @FXML private JFXComboBox<Integer> taskToEditProjectID;
     @FXML private JFXCheckBox isCompleted;
 
     private static User user = null;
@@ -93,13 +95,21 @@ public class App extends Application {
     }
 
     @FXML public void launchEditTaskPane() {
-        if (!taskList.getItems().isEmpty()) {
-            int taskIndex = taskList.getSelectionModel().getSelectedIndex();
+        JFXListView<String> list = new JFXListView<>();
+        int taskIndex = -1;
+        if (taskList.isVisible()) {
+            list.getItems().addAll(taskList.getItems());
+            taskIndex = taskList.getSelectionModel().getSelectedIndex();
+        } else if (projectTaskList.isVisible()) {
+            list = projectTaskList;
+        }
+        if (!list.getItems().isEmpty()) {
             int taskId = taskMap.get(taskIndex).getKey();
+            App.taskId = taskId;
+
             HashMap<Integer, Task> tasks = user.getTasks();
             Task task = tasks.get(taskId);
 
-            App.taskId = taskId;
             this.taskToEditTitle.setText(task.getTitle());
             this.taskToEditDescription.setText(task.getDescription() == null ? "" : task.getDescription());
             this.taskToEditAddedDate.setText(task.getAddedDate());
@@ -107,11 +117,19 @@ public class App extends Application {
             this.taskToEditDueDate.setValue(dueDate != null ? LocalDate.parse(dueDate, formatter) : LocalDate.parse(LocalDateTime.now().format(formatter)));
             this.taskToEditTag.setText(task.getTag() == null ? "" : task.getTag());
             this.taskToEditFrequency.setValue(task.getFrequency());
-            this.taskToEditFlag.getSelectionModel().select(task.getFlag());
+            this.taskToEditFlag.setValue(task.getFlag());
+            this.taskToEditProjectID.setValue(task.getProject_id());
+            this.taskToEditProjectID.setOnAction(e -> this.taskToEditProjectTitle.setText(DatabaseManager.getProjectTitle(taskToEditProjectID.getValue())));
             this.isCompleted.setSelected(task.getCompleted());
 
-            taskList.setVisible(false);
-            editTaskPane.setVisible(true);
+            setPaneVisible(false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    true);
+        } else {
+            System.out.println(4);
         }
     }
 
@@ -129,6 +147,7 @@ public class App extends Application {
 
     @FXML public void editTask() {
         int id = App.taskId;
+        int projectId = this.taskToEditProjectID.getValue();
         String title = this.taskToEditTitle.getText();
         String des = this.taskToEditDescription.getText();
         String addedDate = this.taskToEditAddedDate.getText();
@@ -136,14 +155,16 @@ public class App extends Application {
         String frequency = this.taskToEditFrequency.getValue();
         String tag = this.taskToEditTag.getText();
         String flag = this.taskToEditFlag.getValue();
+
         boolean completed = this.isCompleted.isSelected();
 
         if (DatabaseManager.getDateDif(id, dueDate) < 0) {
             this.dueDateWarning.setVisible(true);
         } else {
             this.dueDateWarning.setVisible(false);
-            Task task = new Task(id, App.user.getUsername(), title, des, addedDate, frequency, dueDate, tag, flag, completed);
+            Task task = new Task(id, projectId, App.user.getUsername(), title, des, addedDate, frequency, dueDate, tag, flag, completed);
             Task taskToEdit = user.getTasks().get(id);
+            taskToEdit.setProject_id(projectId);
             taskToEdit.setTitle(title);
             taskToEdit.setDescription(des);
             taskToEdit.setFrequency(frequency);
@@ -179,6 +200,27 @@ public class App extends Application {
         addProjectPane.setVisible(false);
     }
 
+    @FXML public void updateProjectList() {
+        HashMap<Integer, Project> projects = user.getProjects();
+        int projectIndex = 0;
+        this.projectList.getItems().clear();
+
+        for (Map.Entry<Integer, Project> entry : projects.entrySet()) {
+            Pair<Integer, Project> project = new Pair<>(entry.getKey(), entry.getValue());
+            projectMap.put(projectIndex, project);
+            this.projectList.getItems().add(entry.getValue().getTitle());
+            projectIndex += 1;
+        }
+
+        projectList.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+        setPaneVisible(false,
+                true,
+                false,
+                false,
+                false,
+                false);
+    }
+
     public void updateTaskList() {
         ArrayList<String> frequencies = DatabaseManager.getFrequencies();
         for (String frequency : frequencies) {
@@ -191,6 +233,13 @@ public class App extends Application {
         for (String flag : flags) {
             if (!this.taskToEditFlag.getItems().contains(flag)) {
                 this.taskToEditFlag.getItems().add(flag);
+            }
+        }
+
+        HashMap<Integer, Project> projects = DatabaseManager.getProjects(user.getUsername());
+        for (Map.Entry<Integer, Project> entry : projects.entrySet()) {
+            if (!this.taskToEditProjectID.getItems().contains(entry.getKey())) {
+                this.taskToEditProjectID.getItems().add(entry.getKey());
             }
         }
 
@@ -214,7 +263,7 @@ public class App extends Application {
                 false);
     }
 
-    public void updateProjectTaskList() {
+    @FXML  public void updateProjectTaskList() {
         if (!projectList.getItems().isEmpty()) {
             this.projectTaskList.getItems().clear();
 
@@ -240,7 +289,6 @@ public class App extends Application {
         }
     }
 
-
     public void setPaneVisible(boolean taskListVisible,
                                boolean projectListVisible,
                                boolean projectTaskListVisible,
@@ -254,28 +302,6 @@ public class App extends Application {
         addProjectPane.setVisible(addProjectPaneVisible);
         addTaskPane.setVisible(addTaskPaneVisible);
         editTaskPane.setVisible(editTaskPaneVisible);
-    }
-
-
-    @FXML public void updateProjectList() {
-        HashMap<Integer, Project> projects = user.getProjects();
-        int projectIndex = 0;
-        this.projectList.getItems().clear();
-
-        for (Map.Entry<Integer, Project> entry : projects.entrySet()) {
-            Pair<Integer, Project> project = new Pair<>(entry.getKey(), entry.getValue());
-            projectMap.put(projectIndex, project);
-            this.projectList.getItems().add(entry.getValue().getTitle());
-            projectIndex += 1;
-        }
-
-        projectList.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-        setPaneVisible(false,
-                true,
-                false,
-                 false,
-                false,
-                false);
     }
 
     public void launchAppWindow(User user) {

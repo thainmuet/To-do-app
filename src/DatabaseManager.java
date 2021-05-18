@@ -59,6 +59,7 @@ public class DatabaseManager {
 
     public static void editTask(Task task) {
         int id = task.getId();
+        int projectId = task.getProject_id();
         String title = task.getTitle();
         String des = task.getDescription();
         String addedDate = task.getAddedDate();
@@ -68,9 +69,9 @@ public class DatabaseManager {
         String flag = task.getFlag();
         boolean completed = task.getCompleted();
 
-        String format = "UPDATE task SET title='%s', description='%s', added_date='%s', due_date='%s', frequency='%s', tag='%s', flag='%s', completed=%b WHERE task_id=%d";
-        String query = String.format(format, title, des, addedDate, dueDate, frequency, tag, flag, completed, id);
-
+        String format = "UPDATE task SET project_id=%d, title='%s', description='%s', added_date='%s', due_date='%s', frequency='%s', tag='%s', flag='%s', completed=%b WHERE task_id=%d";
+        String query = String.format(format, projectId, title, des, addedDate, dueDate, frequency, tag, flag, completed, id);
+        System.out.println(query);
         try {
             statement = connection.createStatement();
             statement.executeUpdate(query);
@@ -143,14 +144,13 @@ public class DatabaseManager {
         String query = String.format("SELECT added_date FROM task WHERE task_id=%d", taskId);
         String addedDate = null;
 
-        System.out.println("201: " + query);
+        System.out.println(query);
         try {
             statement = connection.createStatement();
             resultSet = statement.executeQuery(query);
 
             while (resultSet.next()) {
                 addedDate = resultSet.getString("added_date");
-                System.out.println("208: " + addedDate);
             }
         } catch (SQLException e) {
             printExceptionLog(e);
@@ -179,6 +179,21 @@ public class DatabaseManager {
         return id;
     }
 
+    public static String getProjectTitle(int projectId) {
+        String title = "";
+        String query = String.format("SELECT title FROM project WHERE project_id=%d", projectId);
+        try {
+            statement = connection.createStatement();
+            resultSet = statement.executeQuery(query);
+            while (resultSet.next()) {
+                title = resultSet.getString("title");
+            }
+        } catch (SQLException e) {
+            printExceptionLog(e);
+        }
+        return title;
+    }
+
     public static HashMap<String, String> getUsers() {
         HashMap<String, String> users = new HashMap<>();
         try {
@@ -198,10 +213,11 @@ public class DatabaseManager {
         HashMap<Integer, Task> tasks = new HashMap<>();
         try {
             statement  = connection.createStatement();
-            String query = String.format("SELECT * FROM %s WHERE username='%s';", "task", username);
+            String query = String.format("SELECT * FROM %s WHERE username='%s'", "task", username);
             resultSet = statement.executeQuery(query);
             while(resultSet.next()) {
                 Task task = new Task(resultSet.getInt("task_id"),
+                        resultSet.getInt("project_id"),
                         resultSet.getString("username"),
                         resultSet.getString("title"),
                         resultSet.getString("description"),

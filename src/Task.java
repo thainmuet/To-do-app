@@ -183,4 +183,8 @@ public class Task {
         this.flag = flag;
         this.completed = completed;
     }
+
+    public void setProject_id(int project_id) {
+        this.project_id = project_id;
+    }
 }
