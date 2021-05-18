@@ -111,6 +111,7 @@ public class App extends Application {
     }
 
     @FXML public void launchEditTaskPane() {
+        sceneTitle.setText("Edit task");
         JFXListView<String> list = new JFXListView<>();
         boolean check = false;
         int taskIndex;
@@ -159,6 +160,7 @@ public class App extends Application {
     }
 
     @FXML public void launchEditProjectPane() {
+        sceneTitle.setText("Edit project");
         JFXListView<String> list = new JFXListView<>();
         list.getItems().addAll(projectTaskList.getItems());
 
@@ -288,6 +290,7 @@ public class App extends Application {
     }
 
     @FXML public void updateProjectList() {
+        sceneTitle.setText("Projects");
         HashMap<Integer, Project> projects = user.getProjects();
         int projectIndex = 0;
         this.projectList.getItems().clear();
@@ -311,6 +314,7 @@ public class App extends Application {
     }
 
     public void updateTaskList() {
+        sceneTitle.setText("Tasks");
         ArrayList<String> frequencies = DatabaseManager.getFrequencies();
         for (String frequency : frequencies) {
             if (!this.taskToEditFrequency.getItems().contains(frequency)) {
@@ -355,6 +359,7 @@ public class App extends Application {
     }
 
     @FXML  public void updateProjectTaskList() {
+        sceneTitle.setText("Tasks");
         ArrayList<String> flags = DatabaseManager.getFlags();
         for (String flag : flags) {
             if (!this.projectToEditFlag.getItems().contains(flag)) {

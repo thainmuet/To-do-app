@@ -32,7 +32,7 @@
       <JFXButton layoutX="400.0" layoutY="13.0" onAction="#launchAddTaskPane" prefWidth="70.0" style="-fx-background-color: #318bb5;" text="+ Task" textFill="WHITE" AnchorPane.topAnchor="13.0" />
       <JFXButton layoutX="313.0" layoutY="13.0" onAction="#launchAddProjectPane" style="-fx-background-color: #318bb5;" text="+ Project" textFill="WHITE" AnchorPane.topAnchor="13.0" />
       <JFXButton fx:id="editProjectButton" layoutX="211.0" layoutY="13.0" onAction="#launchEditProjectPane" prefHeight="18.0" prefWidth="93.0" style="-fx-background-color: #39c684;" text="Edit project" textFill="WHITE" visible="false" AnchorPane.topAnchor="13.0" />
-      <Label fx:id="sceneTitle" layoutX="36.0" layoutY="-1.0" text="Tasks" AnchorPane.leftAnchor="50.0" AnchorPane.topAnchor="10.0">
+      <Label fx:id="sceneTitle" layoutX="36.0" layoutY="-1.0" AnchorPane.leftAnchor="50.0" AnchorPane.topAnchor="10.0">
          <font>
             <Font name="Liberation Sans Bold" size="26.0" />
          </font>
@@ -161,7 +161,7 @@
          <TextField fx:id="newProjectTitle" layoutX="193.0" layoutY="23.0" promptText="(required)" AnchorPane.leftAnchor="149.0" AnchorPane.rightAnchor="35.0" AnchorPane.topAnchor="24.0" />
          <TextArea fx:id="newProjectDescription" layoutX="149.0" layoutY="60.0" prefHeight="120.0" prefWidth="201.0" AnchorPane.bottomAnchor="333.0" AnchorPane.leftAnchor="149.0" AnchorPane.rightAnchor="35.0" AnchorPane.topAnchor="67.0" />
          <JFXButton layoutX="280.0" layoutY="232.0" onAction="#addProject" prefHeight="28.0" prefWidth="70.0" text="Add" />
-         <JFXButton layoutX="200.0" layoutY="232.0" onAction="#closeAddProjectPane" prefHeight="28.0" prefWidth="70.0" text="Cancel" />
+         <JFXButton layoutX="200.0" layoutY="232.0" onAction="#updateProjectList" prefHeight="28.0" prefWidth="70.0" text="Cancel" />
       </AnchorPane>
    </AnchorPane>
 </AnchorPane>

@@ -36,7 +36,7 @@ public class AuthorizationManager {
     private User user = null;
     public boolean isValid;
 
-    public AuthorizationManager launchSignInWindow() {
+    public void launchSignInWindow() {
         FXMLLoader signInLoader= new FXMLLoader(getClass().getResource(SIGN_IN_WINDOW_PATH));
         try {
             Parent signInRoot = signInLoader.load();
@@ -48,7 +48,7 @@ public class AuthorizationManager {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return signInLoader.getController();
+        signInLoader.getController();
     }
 
     @FXML
@@ -75,7 +75,9 @@ public class AuthorizationManager {
         String password = signUpPassword.getText();
         isValid = DatabaseManager.createAccount(username, password);
         if (isValid) {
-            this.user.setInfo(username, password);
+            this.user = new User(username, password);
+            App app = new App();
+            app.launchAppWindow(this.user);
             signUpWarning.setVisible(false);
             signUpStage.close();
         } else {
