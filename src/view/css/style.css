@@ -1,3 +1,24 @@
-.jfx-button .text {
-    -fx-text-alignment: justify;
+.list-cell:even { /* <=== changed to even */
+    -fx-background-color: #ececec;
 }
+
+.list-cell:odd { /* <=== changed to even */
+    -fx-background-color: #f6f6f6;
+}
+
+.list-cell:filled:hover {
+    -fx-background-color: #ececec;
+    -fx-text-fill: black;
+}
+
+.button:hover {
+    -fx-background-color: #d0d0d0;
+}
+
+.button {
+    -fx-text-fill: black;
+}
+
+/*.list-view .list-cell:selected {*/
+/*    -fx-background-color: #646464;*/
+/*}*/

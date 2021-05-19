@@ -8,7 +8,7 @@
 <?import com.jfoenix.controls.JFXTextField?>
 <?import com.jfoenix.controls.JFXPasswordField?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="AuthorizationManager">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="AuthorizationManager" stylesheets="@../css/style.css">
    <JFXTextField fx:id="signUpUsername" layoutX="165.0" layoutY="54.0" />
    <JFXPasswordField fx:id="signUpPassword" layoutX="165.0" layoutY="100.0" />
    <Text disable="true" layoutX="84.0" layoutY="70.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Username:" />

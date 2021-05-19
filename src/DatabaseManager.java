@@ -71,7 +71,6 @@ public class DatabaseManager {
 
         String format = "UPDATE task SET project_id=%d, title='%s', description='%s', added_date='%s', due_date='%s', frequency='%s', tag='%s', flag='%s', completed=%b WHERE task_id=%d";
         String query = String.format(format, projectId, title, des, addedDate, dueDate, frequency, tag, flag, completed, id);
-        System.out.println(query);
         try {
             statement = connection.createStatement();
             statement.executeUpdate(query);
@@ -148,25 +147,11 @@ public class DatabaseManager {
         return true;
     }
 
-    public static int getFlagPoint(String flag) {
-        String query = String.format("SELECT point FROM importance WHERE flag='%s'", flag);
-        int point = 0;
-        try {
-            statement = connection.createStatement();
-            point = statement.executeUpdate(query);
-        } catch (SQLException e) {
-            printExceptionLog(e);
-        }
-        return point;
-    }
-
     public static int getDateDif(int id, String dueDate, String table) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String queryColumn = table.equals("task") ? "task_id" : "project_id";
         String query = String.format("SELECT added_date FROM %s WHERE %s=%d", table, queryColumn, id);
         String addedDate = null;
-
-        System.out.println(query);
         try {
             statement = connection.createStatement();
             resultSet = statement.executeQuery(query);

@@ -8,6 +8,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -24,8 +25,9 @@ import java.util.Map;
 
 public class App extends Application {
 
-    private static final String APP_NAME = "To-do";
+    private static final String APP_NAME = "To - do";
     private static final String APP_WINDOW = "view/fxml/App.fxml";
+    private static final String APPLICATION_ICON_PATH = "view/logo.png";
 
     @FXML protected TextField taskToEditProjectTitle;
     @FXML protected JFXListView<String> taskList = new JFXListView<>();
@@ -285,10 +287,6 @@ public class App extends Application {
         }
     }
 
-    @FXML public void closeAddProjectPane() {
-        addProjectPane.setVisible(false);
-    }
-
     @FXML public void updateProjectList() {
         sceneTitle.setText("Projects");
         HashMap<Integer, Project> projects = user.getProjects();
@@ -421,6 +419,7 @@ public class App extends Application {
             Parent appRoot = appLoader.load();
             Scene appScene = new Scene(appRoot);
             Stage appStage = new Stage();
+            appStage.getIcons().add(new Image(APPLICATION_ICON_PATH));
             appStage.setScene(appScene);
             appStage.setTitle(APP_NAME);
             appStage.show();
